@@ -14,7 +14,7 @@ export default function Button(props) {
     if (props.onClick) props.onClick();
   };
 
-  if (props.isDisbled || isLoading) {
+  if (props.isDisbled || props.isLoading) {
     if (props.isDisbled) className.push('disabled');
     return (
       <span className={className.join(' ')} style={props.style}>
