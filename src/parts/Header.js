@@ -46,11 +46,9 @@ export default function Header() {
             </ul>
 
             {/* dipakai ketika belum melakukan login */}
-            <div className={`nav-item${getNavLinkClass('/')}`}>
-              <Button className="btn btn-login" to="/">
-                Masuk / Daftar
-              </Button>
-            </div>
+            <Button className="btn btn-login" to="/">
+              Masuk / Daftar
+            </Button>
 
             {/* dipakai ketika telah melakukan login */}
             {/* <div class="nav-item dropdown">
@@ -65,18 +63,10 @@ export default function Header() {
               </a>
 
               <div className="dropdown-menu">
-                <Button
-                  className={`dropdown-item${getNavLinkClass('/history')}`}
-                  type="link"
-                  href="/history"
-                >
+                <Button className="dropdown-item" type="link" href="/history">
                   History
                 </Button>
-                <Button
-                  className={`dropdown-item${getNavLinkClass('/logout')}`}
-                  type="link"
-                  href="/logout"
-                >
+                <Button className="dropdown-item" type="link" href="/logout">
                   Logout
                 </Button>
               </div>
