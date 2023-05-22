@@ -43,36 +43,100 @@
 @import 'utilities';
 @import 'print';
 
+@font-face {
+  font-family: 'SFPD-Regular';
+  src: local('San Francisco Pro Display'),
+    url(../../fonts/sfprodisplay_regular.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'SFPD-SemiBold';
+  src: local('San Francisco Pro Display'),
+    url(../../fonts/sfprodisplay_semibold.ttf) format('truetype');
+}
+
 .brand-logo {
   height: 63px;
   padding-right: 52px;
+  padding-left: 26px;
 }
 
 header {
-  border-bottom: 1px solid $gray-100;
   width: 100%;
-  position: relative;
+  position: sticky;
+  top: 0;
+  font-family: 'SFPD-Regular';
+  font-size: 20px;
 
-  .navbar {
-    height: 80px;
+  .container-fluid {
+    padding-left: 44px;
+    padding-right: 44px;
+    background-color: $white;
 
-    .navbar-nav {
-      li.nav-item {
-        a {
-          &.nav-link {
-            color: $gray-800;
-            padding-right: 24px;
-            &:hover {
-              color: $blue;
+    .navbar {
+      height: 80px;
+
+      div.navbar-collapse {
+        background-color: $white;
+        &.show {
+          padding-left: 16px;
+          margin-left: -60px;
+          margin-right: -60px;
+          div.dropdown-menu {
+            min-width: 10rem;
+          }
+        }
+        &.collapsing {
+          transition: none;
+        }
+      }
+
+      ul.navbar-nav {
+        li.nav-item {
+          &.active {
+            a.nav-link {
+              font-family: 'SFPD-SemiBold';
+              color: $primary;
+            }
+          }
+          a {
+            &.nav-link {
+              color: $dark;
+              padding-right: 12px;
+              padding-left: 12px;
+              &:hover {
+                color: $primary;
+              }
             }
           }
         }
       }
-    }
-    li.nav-item {
-      a {
-        &.nav-link {
-          color: $blue;
+
+      div.nav-item {
+        a {
+          &.nav-link {
+            color: $primary;
+            padding-left: 0px;
+          }
+          &.dropdown-item {
+            font-size: 20px;
+          }
+        }
+        div.dropdown-menu {
+          min-width: 10rem;
+        }
+      }
+
+      .btn {
+        &.btn-login {
+          border: 1px solid $primary;
+          font-size: 16px;
+          color: $primary;
+          margin-top: 8px;
+          margin-bottom: 8px;
+          &:focus {
+            box-shadow: none;
+          }
         }
       }
     }

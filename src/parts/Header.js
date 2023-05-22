@@ -1,22 +1,32 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import Button from '../elements/Button';
 import BrandIcon from './BrandIcon';
-import { useLocation } from 'react-router-dom'
 
 export default function Header() {
-
-  const location = useLocation()
+  const location = useLocation();
   const getNavLinkClass = (path) => {
     return location.pathname === path ? ' active' : '';
   };
 
   return (
     <header className="spacing-sm">
-      <div className="container">
+      <div className="container-fluid">
         <nav className="navbar navbar-expand-lg navbar-light">
           <BrandIcon />
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
 
-          <div className="collapse navbar-collapse">
+          <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav mr-auto">
               <li className={`nav-item${getNavLinkClass('/')}`}>
                 <Button className="nav-link" type="link" href="/">
@@ -34,16 +44,26 @@ export default function Header() {
                 </Button>
               </li>
             </ul>
-            <li className="nav-item dropdown">
+
+            {/* dipakai ketika belum melakukan login */}
+            <div className={`nav-item${getNavLinkClass('/')}`}>
+              <Button className="btn btn-login" type="link" href="/">
+                Masuk / Daftar
+              </Button>
+            </div>
+
+            {/* dipakai ketika telah melakukan login */}
+            {/* <div class="nav-item dropdown">
               <a
-                className="nav-link dropdown-toggle"
+                class="nav-link dropdown-toggle"
                 href="/"
                 role="button"
                 data-toggle="dropdown"
                 aria-expanded="false"
               >
-                Dropdown
+                John Doe
               </a>
+
               <div className="dropdown-menu">
                 <Button
                   className={`dropdown-item${getNavLinkClass('/history')}`}
@@ -60,7 +80,7 @@ export default function Header() {
                   Logout
                 </Button>
               </div>
-            </li>
+            </div> */}
           </div>
         </nav>
       </div>
