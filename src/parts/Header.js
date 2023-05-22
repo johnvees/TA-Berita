@@ -47,7 +47,7 @@ export default function Header() {
 
             {/* dipakai ketika belum melakukan login */}
             <div className={`nav-item${getNavLinkClass('/')}`}>
-              <Button className="btn btn-login" type="link" href="/">
+              <Button className="btn btn-login" to="/">
                 Masuk / Daftar
               </Button>
             </div>
