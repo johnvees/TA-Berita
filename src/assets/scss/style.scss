@@ -156,11 +156,30 @@ header {
   }
 }
 
+.vector {
+  &.vector-left {
+    width: 284px;
+    position: sticky;
+    top: 30%;
+    z-index: 0;
+  }
+
+  &.vector-right {
+    width: 284px;
+    // margin-left: 20px;
+    position: sticky;
+    float: right;
+    top: 30%;
+    z-index: 0;
+  }
+}
+
 .hero {
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  z-index: 2;
 
   div.hero-landing {
     display: flex;
