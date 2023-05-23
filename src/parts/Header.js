@@ -15,7 +15,7 @@ export default function Header() {
         <nav className="navbar navbar-expand-lg navbar-light">
           <BrandIcon />
           <button
-            class="navbar-toggler"
+            className="navbar-toggler"
             type="button"
             data-toggle="collapse"
             data-target="#navbarSupportedContent"
@@ -23,7 +23,7 @@ export default function Header() {
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
-            <span class="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon"></span>
           </button>
 
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
@@ -51,9 +51,9 @@ export default function Header() {
             </Button>
 
             {/* dipakai ketika telah melakukan login */}
-            {/* <div class="nav-item dropdown">
+            {/* <div className="nav-item dropdown">
               <a
-                class="nav-link dropdown-toggle"
+                className="nav-link dropdown-toggle"
                 href="/"
                 role="button"
                 data-toggle="dropdown"
