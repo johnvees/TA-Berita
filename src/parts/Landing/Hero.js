@@ -4,8 +4,8 @@ import Button from '../../elements/Button';
 export default function Hero() {
   return (
     <section>
-      <div className="hero">
-        <div className="hero-landing">
+      <div className="hero-landing">
+        <div className="title">
           <h1>Sistem Kurator Berita Gratis Untuk Anda</h1>
           <p>
             Saat ini telah banyak berita yang dipublikasikan baik melalui media

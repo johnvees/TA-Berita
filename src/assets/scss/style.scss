@@ -174,14 +174,14 @@ header {
   }
 }
 
-.hero {
+.hero-landing {
   height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   z-index: 2;
 
-  div.hero-landing {
+  div.title {
     display: flex;
     flex-direction: column;
     align-items: center;
