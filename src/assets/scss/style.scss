@@ -55,10 +55,22 @@
     url(../../fonts/sfprodisplay_semibold.ttf) format('truetype');
 }
 
+@font-face {
+  font-family: 'SFPD-Bold';
+  src: local('San Francisco Pro Display'),
+    url(../../fonts/sfprodisplay_bold.ttf) format('truetype');
+}
+
 .brand-logo {
   height: 63px;
   padding-right: 52px;
   padding-left: 26px;
+}
+
+section.container-fluid {
+  padding-left: 60px;
+  padding-right: 60px;
+  background-color: $white;
 }
 
 header {
@@ -67,6 +79,7 @@ header {
   top: 0;
   font-family: 'SFPD-Regular';
   font-size: 20px;
+  z-index: 1000;
 
   .container-fluid {
     padding-left: 44px;
@@ -138,6 +151,46 @@ header {
             box-shadow: none;
           }
         }
+      }
+    }
+  }
+}
+
+.hero-landing {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  // align-items: center;
+  justify-content: center;
+
+  h1 {
+    font-family: SFPD-Bold;
+    font-size: 54px;
+    color: $black;
+    text-align: center;
+    margin-bottom: 34px;
+    max-width: 872px;
+  }
+
+  p {
+    font-family: SFPD-Regular;
+    font-size: 20px;
+    color: $dark;
+    text-align: center;
+    margin-bottom: 45px;
+    max-width: 872px;
+  }
+
+  .btn {
+    &.btn-mulai {
+      font-family: SFPD-Semibold;
+      font-size: 20px;
+      color: $white;
+      background-color: $primary;
+      display: block;
+      width: 100%;
+      &:focus {
+        box-shadow: none;
       }
     }
   }
