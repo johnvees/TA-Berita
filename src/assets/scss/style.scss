@@ -156,29 +156,54 @@ header {
   }
 }
 
+.vector {
+  &.vector-left {
+    width: 284px;
+    position: sticky;
+    top: 30%;
+    z-index: 0;
+  }
+
+  &.vector-right {
+    width: 284px;
+    // margin-left: 20px;
+    position: sticky;
+    float: right;
+    top: 30%;
+    z-index: 0;
+  }
+}
+
 .hero-landing {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  // align-items: center;
   justify-content: center;
+  z-index: 2;
 
-  h1 {
-    font-family: SFPD-Bold;
-    font-size: 54px;
-    color: $black;
-    text-align: center;
-    margin-bottom: 34px;
-    max-width: 872px;
-  }
+  div.title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-  p {
-    font-family: SFPD-Regular;
-    font-size: 20px;
-    color: $dark;
-    text-align: center;
-    margin-bottom: 45px;
-    max-width: 872px;
+    h1 {
+      font-family: SFPD-Bold;
+      font-size: 54px;
+      color: $black;
+      text-align: center;
+      margin-bottom: 34px;
+      max-width: 872px;
+    }
+
+    p {
+      font-family: SFPD-Regular;
+      font-size: 20px;
+      color: $dark;
+      text-align: center;
+      margin-bottom: 45px;
+      max-width: 872px;
+    }
   }
 
   .btn {
