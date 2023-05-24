@@ -179,7 +179,6 @@ header {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  z-index: 2;
 
   div.title {
     display: flex;
@@ -217,6 +216,82 @@ header {
       &:focus {
         box-shadow: none;
       }
+    }
+  }
+}
+
+.content-landing {
+  height: 80vh;
+
+  div.title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // justify-content: center;
+  }
+
+  h2 {
+    font-family: SFPD-Bold;
+    font-size: 40px;
+    color: $black;
+    text-align: center;
+    margin-bottom: 20px;
+    max-width: 872px;
+  }
+
+  .btn {
+    margin-bottom: 10px;
+    &.btn-active {
+      font-family: SFPD-Semibold;
+      font-size: 16px;
+      color: $white;
+      background-color: $primary;
+      display: block;
+      width: 100%;
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    &.btn-deactive {
+      font-family: SFPD-Semibold;
+      font-size: 16px;
+      color: $dark;
+      background-color: $light;
+      display: block;
+      width: 100%;
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+  .il {
+    margin-bottom: 20px;
+    &.il-sumber {
+      width: 100%;
+    }
+  }
+
+  .vertical-line {
+    width: 1px;
+    height: 100%; /* Adjust the height as needed */
+    background: linear-gradient(to bottom, $white, $primary, $white);
+  }
+
+  .desc {
+    &.title {
+      font-family: SFPD-Semibold;
+      font-size: 32px;
+      color: $black;
+      text-align: left;
+    }
+
+    &.content {
+      font-family: SFPD-Regular;
+      font-size: 20px;
+      color: $dark;
+      text-align: left;
     }
   }
 }

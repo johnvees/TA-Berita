@@ -3,6 +3,7 @@ import Header from '../parts/Header';
 import Hero from '../parts/Landing/Hero';
 import VectorLeft from '../assets/images/vectorleft.png';
 import VectorRight from '../assets/images/vectorright.png';
+import Content from '../parts/Landing/Content';
 
 export default class LandingPage extends Component {
   render() {
@@ -19,6 +20,7 @@ export default class LandingPage extends Component {
             </div>
             <div className="col-sm-8 col-md-8 col-lg-8 col-xl-8">
               <Hero {...this.props}></Hero>
+              <Content {...this.props}></Content>
             </div>
             <div
               className="col-sm-2 col-md-2 col-lg-2 col-xl-2 d-none d-md-block"
@@ -28,18 +30,6 @@ export default class LandingPage extends Component {
             </div>
           </div>
         </div>
-        <p>Test Word</p>
-        <p>test 222222222</p>
-        <p>test 2222222222</p>
-        <p>test 2222222222</p>
-        <p>test 2222222222</p>
-        <p>test 2222222222</p>
-        <p style={{ height: 1000 }}>test 2</p>
-        <p>test 2</p>
-        <p>test 2</p>
-        <p>test 2</p>
-        <p>test 2</p>
-        <p>test 2</p>
       </>
     );
   }
