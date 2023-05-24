@@ -295,3 +295,141 @@ header {
     }
   }
 }
+
+.content-about {
+  .first-content {
+    height: 70vh;
+    background-color: $primary;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h1 {
+      font-family: SFPD-Bold;
+      font-size: 54px;
+      color: $white;
+      text-align: center;
+      margin-bottom: 34px;
+      max-width: 872px;
+    }
+
+    p {
+      font-family: SFPD-Regular;
+      font-size: 20px;
+      color: $light;
+      text-align: center;
+      max-width: 872px;
+    }
+  }
+
+  .second-content {
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+
+    h3 {
+      font-family: SFPD-Bold;
+      font-size: 28px;
+      color: $primary;
+      text-align: center;
+      max-width: 872px;
+      letter-spacing: 4px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .desc {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: auto;
+      margin-bottom: auto;
+
+      h2 {
+        font-family: SFPD-Bold;
+        font-size: 40px;
+        color: $black;
+        text-align: center;
+        max-width: 872px;
+        margin-bottom: 30px;
+      }
+
+      p {
+        font-family: SFPD-Regular;
+        font-size: 20px;
+        color: $dark;
+        text-align: center;
+        max-width: 872px;
+      }
+    }
+  }
+
+  .third-content {
+    height: 70vh;
+    background-color: $primary;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    margin-top: 50px;
+
+    h3 {
+      font-family: SFPD-Bold;
+      font-size: 28px;
+      color: $white;
+      text-align: center;
+      max-width: 872px;
+      letter-spacing: 4px;
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    .desc {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      margin-top: auto;
+      margin-bottom: auto;
+
+      h5 {
+        font-family: SFPD-Bold;
+        font-size: 28px;
+        color: $white;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-family: SFPD-Regular;
+        font-size: 20px;
+        color: $white;
+        &.desc {
+          color: $light;
+          margin-top: 40px;
+        }
+      }
+    }
+  }
+}
+
+.float-component {
+  width: 100%;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: top 0.1s;
+}
+
+@media (max-height: 100vh) {
+  .float-component {
+    top: 100px;
+    transform: translate(-50%, -50%) translateY(calc(-10px + 50%));
+  }
+}
+
+
