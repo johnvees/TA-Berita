@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../../elements/Button';
 import ILPortal from '../../assets/images/portalvector.png';
 import ILUrl from '../../assets/images/urlvector.png';
@@ -36,6 +36,10 @@ export default function Content() {
   const handleButtonClick = (buttonName) => {
     setSelectedButton(buttonName);
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <section>
