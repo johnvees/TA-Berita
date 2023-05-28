@@ -46,7 +46,7 @@ export default function Header() {
             </ul>
 
             {/* dipakai ketika belum melakukan login */}
-            <Button className="btn btn-login" to="/">
+            <Button className="btn btn-login" type="link" href="/auth">
               Masuk / Daftar
             </Button>
 

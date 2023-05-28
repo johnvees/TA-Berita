@@ -298,6 +298,7 @@ header {
 
 .content-about {
   .first-content {
+    padding: 0 15px;
     height: 70vh;
     background-color: $primary;
     display: flex;
@@ -325,6 +326,7 @@ header {
 
   .second-content {
     height: 70vh;
+    padding: 0 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -370,6 +372,7 @@ header {
 
   .third-content {
     height: 70vh;
+    padding: 0 15px;
     background-color: $primary;
     display: flex;
     flex-direction: column;
@@ -416,6 +419,213 @@ header {
   }
 }
 
+.input-content {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+
+  .login-content-logo {
+    width: 100%;
+    margin-top: 50px;
+    margin-bottom: -50px;
+  }
+
+  .login-content-input {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    h2 {
+      font-family: SFPD-Bold;
+      font-size: 40px;
+      color: $black;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-family: SFPD-Regular;
+      font-size: 20px;
+      color: $dark;
+      margin-bottom: 16px;
+    }
+
+    .input-group {
+      margin-bottom: 24px;
+
+      .input-group-text {
+        background-color: $primary;
+        color: $white;
+        font-family: 'SFPD-Regular';
+        font-size: 12px;
+        border: 1px solid $black;
+      }
+      input {
+        border-color: $black;
+        color: $black;
+        &:focus {
+          box-shadow: none;
+        }
+      }
+    }
+
+    .btn-auth-login {
+      background-color: $primary;
+      color: $white;
+      font-family: 'SFPD-SemiBold';
+      margin-bottom: 16px;
+
+      &.disabled {
+        background-color: $light;
+        color: $dark;
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    .link-auth-login {
+      text-align: center;
+      font-family: 'SFPD-Regular';
+      font-size: 14px;
+      color: $primary;
+      text-decoration: underline;
+    }
+
+    .link-auth-back-wrapper {
+      position: absolute;
+      bottom: 50px;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .link-auth-back {
+      text-align: center;
+      font-family: 'SFPD-Regular';
+      font-size: 14px;
+      color: $dark;
+      text-decoration: underline;
+      justify-self: end;
+      height: 100%;
+    }
+  }
+
+  .register-content-logo {
+    margin-top: 50px;
+    margin-bottom: -50px;
+  }
+
+  .register-content-input {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    h2 {
+      font-family: SFPD-Bold;
+      font-size: 40px;
+      color: $black;
+      margin-bottom: 16px;
+      text-align: end;
+    }
+
+    p {
+      font-family: SFPD-Regular;
+      font-size: 20px;
+      color: $dark;
+      margin-bottom: 16px;
+      text-align: end;
+    }
+
+    .input-group {
+      margin-bottom: 24px;
+
+      .input-group-text {
+        background-color: $primary;
+        color: $white;
+        font-family: 'SFPD-Regular';
+        font-size: 12px;
+        border: 1px solid $black;
+      }
+      input {
+        border-color: $black;
+        color: $black;
+        &:focus {
+          box-shadow: none;
+        }
+      }
+    }
+
+    .btn-auth {
+      background-color: $primary;
+      color: $white;
+      font-family: 'SFPD-SemiBold';
+      margin-bottom: 16px;
+
+      &.disabled {
+        background-color: $light;
+        color: $dark;
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    .link-auth {
+      text-align: center;
+      font-family: 'SFPD-Regular';
+      font-size: 14px;
+      color: $primary;
+      text-decoration: underline;
+    }
+
+    .link-auth-back-wrapper {
+      position: absolute;
+      bottom: 50px;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .link-auth-back {
+      text-align: center;
+      font-family: 'SFPD-Regular';
+      font-size: 14px;
+      color: $dark;
+      text-decoration: underline;
+      justify-self: end;
+      height: 100%;
+    }
+  }
+}
+
+.image-content {
+  height: calc(100vh - 100px);
+  overflow: hidden;
+  text-align: center;
+  position: relative;
+
+  &.image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+  }
+}
+
 .float-component {
   width: 100%;
   position: fixed;
@@ -431,5 +641,3 @@ header {
     transform: translate(-50%, -50%) translateY(calc(-10px + 50%));
   }
 }
-
-
