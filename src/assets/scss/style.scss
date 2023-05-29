@@ -553,6 +553,12 @@ header {
       color: $dark;
       margin-bottom: 16px;
       text-align: end;
+
+      &.warning {
+        font-size: 12px;
+        color: red;
+        margin-top: -24px;
+      }
     }
 
     .input-group {
@@ -568,13 +574,18 @@ header {
       .form-control {
         border-color: $black;
         color: $black;
+
         &:focus {
           box-shadow: none;
+        }
+
+        &.input-warning {
+          border-color: red;
         }
       }
     }
 
-    .btn-auth {
+    .btn-auth-register {
       background-color: $primary;
       color: $white;
       font-family: 'SFPD-SemiBold';
@@ -590,7 +601,7 @@ header {
       }
     }
 
-    .link-auth {
+    .link-auth-register {
       text-align: center;
       font-family: 'SFPD-Regular';
       font-size: 14px;
