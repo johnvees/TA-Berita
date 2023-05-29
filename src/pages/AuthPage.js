@@ -1,10 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../elements/Button';
 import BrandLogo from '../assets/images/brandlogo.png';
 import ILLogin from '../assets/images/loginimg.png';
 import ILRegister from '../assets/images/registerimg.png';
 
 export default function AuthPage() {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [usernameWarning, setUsernameWarning] = useState(false);
+  const [passwordWarning, setPasswordWarning] = useState(false);
+
+  const handleUsernameChange = (event) => {
+    setUsername(event.target.value);
+    if (event.target.value.length === 0) {
+      setUsernameWarning(true);
+    } else {
+      setUsernameWarning(false);
+    }
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+    if (event.target.value.length === 0 || event.target.value.length < 8) {
+      setPasswordWarning(true);
+    } else {
+      setPasswordWarning(false);
+    }
+  };
+
+  const handleLogin = () => {
+    let hasError = false;
+
+    if (username.length === 0) {
+      setUsernameWarning(true);
+      hasError = true;
+    }
+
+    if (password.length === 0 || password.length < 8) {
+      setPasswordWarning(true);
+      hasError = true;
+    }
+
+    if (!hasError) {
+      // Here, you can implement your login logic
+      // For example, you can send the username and password to a server for authentication
+      console.log('Username:', username);
+      console.log('Password:', password);
+
+      // Navigate to another page (e.g., '/dashboard') after successful login
+      navigate('/');
+    }
+  };
+
+  const isDisabled =
+    username.length === 0 || password.length === 0 || password.length < 8;
+
   return (
     <section className="container-fluid">
       <div className="row align-items-center">
@@ -32,13 +84,22 @@ export default function AuthPage() {
                   </span>
                 </div>
                 <input
-                  className="form-control"
+                  className={`form-control ${
+                    usernameWarning ? 'input-warning' : ''
+                  }`}
                   type="text"
                   placeholder="contoh123"
+                  value={username}
+                  onChange={handleUsernameChange}
                   aria-label="username-login"
                   aria-describedby="basic-addon1"
                 />
               </div>
+              {usernameWarning && username.length === 0 && (
+                <p className="warning">
+                  Tolong masukkan username Anda dengan benar
+                </p>
+              )}
               <div className="input-group">
                 <div className="input-group-prepend">
                   <span className="input-group-text" id="basic-addon1">
@@ -46,14 +107,36 @@ export default function AuthPage() {
                   </span>
                 </div>
                 <input
-                  className="form-control"
+                  className={`form-control ${
+                    passwordWarning ? 'input-warning' : ''
+                  }`}
                   type="password"
                   placeholder="********"
+                  value={password}
+                  onChange={handlePasswordChange}
                   aria-label="password-login"
                   aria-describedby="basic-addon1"
                 />
               </div>
-              <Button className="btn btn-auth-login">Masuk</Button>
+              {passwordWarning && password.length === 0 && (
+                <p className="warning">
+                  Tolong masukkan password Anda dengan benar
+                </p>
+              )}
+              {passwordWarning &&
+                password.length > 0 &&
+                password.length < 8 && (
+                  <p className="warning">
+                    Tolong masukkan password dengan minimal 8 karakter
+                  </p>
+                )}
+              <Button
+                className={`btn btn-auth-login ${isDisabled ? 'disabled' : ''}`}
+                onClick={handleLogin}
+                disabled={isDisabled}
+              >
+                Masuk
+              </Button>
               <Button className="link-auth-login" type="link" onClick={onclick}>
                 Belum memiliki akun? Daftar disini
               </Button>
@@ -76,7 +159,8 @@ export default function AuthPage() {
   );
 }
 
-{/* <div className="col-sm-7 col-md-7 col-lg-7 col-xl-7 d-none d-sm-block">
+{
+  /* <div className="col-sm-7 col-md-7 col-lg-7 col-xl-7 d-none d-sm-block">
           <div className="image-content">
             <img className="image-content image" src={ILRegister} alt="" />
           </div>
@@ -153,4 +237,5 @@ export default function AuthPage() {
               </div>
             </div>
           </div>
-        </div> */}
+        </div> */
+}
