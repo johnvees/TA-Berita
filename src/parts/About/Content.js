@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import ProfileImage from '../../assets/images/profileimg.jpg';
+import ProfileImage from '../../assets/images/profileimg.png';
 
 export default function Content() {
   useEffect(() => {
