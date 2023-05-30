@@ -265,7 +265,7 @@ export default function AuthPage() {
                     aria-label="fullname-register"
                     aria-describedby="basic-addon1"
                   />
-                  <div className="input-group-prepend">
+                  <div className="input-group-append">
                     <span className="input-group-text" id="basic-addon1">
                       Nama Lengkap
                     </span>
@@ -290,7 +290,7 @@ export default function AuthPage() {
                     aria-label="username-register"
                     aria-describedby="basic-addon1"
                   />
-                  <div className="input-group-prepend">
+                  <div className="input-group-append">
                     <span className="input-group-text" id="basic-addon1">
                       Username
                     </span>
@@ -315,7 +315,7 @@ export default function AuthPage() {
                     aria-label="password-register"
                     aria-describedby="basic-addon1"
                   />
-                  <div className="input-group-prepend">
+                  <div className="input-group-append">
                     <span className="input-group-text" id="basic-addon1">
                       Password
                     </span>

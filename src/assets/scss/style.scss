@@ -296,6 +296,92 @@ header {
   }
 }
 
+.hero-search {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .search-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h1 {
+      font-family: SFPD-Bold;
+      font-size: 54px;
+      color: $black;
+      text-align: center;
+      margin-bottom: 34px;
+      max-width: 872px;
+    }
+  }
+
+  .search-menu-wrapper {
+    border: 1px dashed $dark;
+    width: 100%;
+
+    .input-group {
+      .form-control {
+        border-color: $black;
+        color: $black;
+        font-family: 'SFPD-Regular';
+
+        &:focus {
+          box-shadow: none;
+        }
+
+        &.input-warning {
+          border-color: red;
+        }
+      }
+
+      .input-group-text {
+        background-color: $primary;
+        color: $white;
+        font-family: 'SFPD-Regular';
+        border: 1px solid $black;
+        padding: 0 32px;
+
+        &.persen {
+          padding: 0 12px;
+        }
+      }
+    }
+  }
+
+  .search-filter-wrapper {
+    padding: 16px 16px;
+
+    p {
+      font-family: 'SFPD-Regular';
+      font-size: 16px;
+      color: $dark;
+    }
+
+    .custom-select {
+      border-color: $black;
+      font-family: 'SFPD-Regular';
+
+      &:focus {
+        box-shadow: none;
+      }
+
+      option:hover {
+        background-color: $primary;
+      }
+    }
+
+    .vertical-divider {
+      width: 1px;
+      height: 100%; /* Adjust the height as needed */
+      background: linear-gradient(to bottom, $white, $primary, $white);
+    }
+  }
+}
+
 .content-about {
   .first-content {
     padding: 0 15px;
@@ -472,6 +558,7 @@ header {
       .form-control {
         border-color: $black;
         color: $black;
+        font-family: 'SFPD-Regular';
 
         &:focus {
           box-shadow: none;
@@ -574,6 +661,7 @@ header {
       .form-control {
         border-color: $black;
         color: $black;
+        font-family: 'SFPD-Regular';
 
         &:focus {
           box-shadow: none;
