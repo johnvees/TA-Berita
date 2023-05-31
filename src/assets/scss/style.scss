@@ -341,7 +341,7 @@ header {
       .input-group-text {
         background-color: $primary;
         color: $white;
-        font-family: 'SFPD-Regular';
+        font-family: 'SFPD-Semibold';
         border: 1px solid $black;
         padding: 0 32px;
 
@@ -353,7 +353,7 @@ header {
   }
 
   .search-filter-wrapper {
-    padding: 16px 16px;
+    padding: 16px;
 
     p {
       font-family: 'SFPD-Regular';
@@ -375,9 +375,40 @@ header {
     }
 
     .vertical-divider {
-      width: 1px;
       height: 100%; /* Adjust the height as needed */
-      background: linear-gradient(to bottom, $white, $primary, $white);
+      border: none;
+      border-left: 1px dashed $dark;
+    }
+
+    .horizontal-divider {
+      border: none;
+      border-bottom: 1px dashed $dark;
+      width: calc(100% + 32px);
+      margin-left: -16px;
+    }
+
+    .btn {
+      &.btn-add {
+        background-color: $primary;
+        font-family: 'SFPD-Semibold';
+        color: $white;
+        display: block;
+        width: 100%;
+        &:focus {
+          box-shadow: none;
+        }
+      }
+
+      &.btn-reset {
+        background-color: $light;
+        font-family: 'SFPD-Semibold';
+        color: $dark;
+        display: block;
+        width: 100%;
+        &:focus {
+          box-shadow: none;
+        }
+      }
     }
   }
 }
