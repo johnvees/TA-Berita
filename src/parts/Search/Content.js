@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Button from '../../elements/Button';
 import ICVectorDownGray from '../../assets/images/vectordowngray.png';
 import ICVectorDownBlue from '../../assets/images/vectordown.png';
+import ImgExample from '../../assets/images/urlvector.png';
 
 export default function Content() {
   const [selectedOption, setSelectedOption] = useState('portal berita');
@@ -14,6 +15,15 @@ export default function Content() {
     setSelectedOption(e.target.value);
     setShowResult(false);
   };
+
+  useEffect(() => {
+    if (showResult) {
+      const resultComp = document.getElementById('show-result');
+      if (resultComp) {
+        window.scrollTo({ top: resultComp.offsetTop, behavior: 'smooth' });
+      }
+    }
+  }, [showResult]);
 
   const handleToggleResultScreen = () => {
     setShowResult(true);
@@ -233,7 +243,7 @@ export default function Content() {
         </div>
         <div className="col-auto"></div>
 
-        <div className="search-menu-wrapper">
+        <div className="search-menu-wrapper rounded-lg">
           <div className="input-group">
             <input
               className="form-control"
@@ -257,15 +267,94 @@ export default function Content() {
       </div>
 
       {showResult && (
-        <>
-          <div className="result-search">
+        <div id="show-result" className="result-search mb-5">
+          <div className="result-title-wrapper">
             <div className="col-auto"></div>
             <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1 d-none d-md-block mb-3">
-              <img src={ICVectorDownBlue} alt="" style={{ width: '100%' }} />
+              <img
+                src={ICVectorDownBlue}
+                alt=""
+                style={{ width: '100%', marginTop: '-150px' }}
+              />
             </div>
             <div className="col-auto"></div>
+            <h1>Hasil Pencarian Berita</h1>
           </div>
-        </>
+
+          <h5 className="half mb-2">
+            Sumber Berita : <span>URL / Link</span>
+          </h5>
+          <h5 className="half mb-2">
+            Jumlah Berita yang Ditampilkan : <span>3 URLs</span>
+          </h5>
+          <h5 className="half mb-2">
+            Minimum Persentase Kemiripan : <span>15%</span>
+          </h5>
+
+          <div className="news-result-wrapper rounded-lg mt-5">
+            <div className="row">
+              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                <img
+                className='mb-3'
+                  src={ImgExample}
+                  alt=""
+                  style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }}
+                />
+              </div>
+              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                <h4 className='mb-3'>Judul Berita</h4>
+                <h5 className='mb-2'>
+                  Persentase Kemiripan : <span>hasil %</span>
+                </h5>
+                <h5 className='mb-2'>
+                  Kata Kunci Berita : <span>hasil kata kunci</span>
+                </h5>
+              </div>
+            </div>
+          </div>
+          <div className="news-result-wrapper rounded-lg mt-5">
+            <div className="row">
+              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                <img
+                className='mb-3'
+                  src={ImgExample}
+                  alt=""
+                  style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }}
+                />
+              </div>
+              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                <h4 className='mb-3'>Judul Berita</h4>
+                <h5 className='mb-2'>
+                  Persentase Kemiripan : <span>hasil %</span>
+                </h5>
+                <h5 className='mb-2'>
+                  Kata Kunci Berita : <span>hasil kata kunci</span>
+                </h5>
+              </div>
+            </div>
+          </div>
+          <div className="news-result-wrapper rounded-lg mt-5">
+            <div className="row">
+              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                <img
+                className='mb-3'
+                  src={ImgExample}
+                  alt=""
+                  style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }}
+                />
+              </div>
+              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                <h4 className='mb-3'>Judul Berita</h4>
+                <h5 className='mb-2'>
+                  Persentase Kemiripan : <span>hasil %</span>
+                </h5>
+                <h5 className='mb-2'>
+                  Kata Kunci Berita : <span>hasil kata kunci</span>
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );

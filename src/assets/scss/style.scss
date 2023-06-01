@@ -394,13 +394,13 @@ header {
 
     .btn {
       background-color: $primary;
-        font-family: 'SFPD-Semibold';
-        color: $white;
-        display: block;
-        width: 100%;
-        &:focus {
-          box-shadow: none;
-        }
+      font-family: 'SFPD-Semibold';
+      color: $white;
+      display: block;
+      width: 100%;
+      &:focus {
+        box-shadow: none;
+      }
 
       &.btn-reset {
         background-color: $red;
@@ -422,10 +422,46 @@ header {
 }
 
 .result-search {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  .result-title-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h1 {
+      font-family: 'SFPD-Bold';
+      font-size: 54px;
+      color: $black;
+      text-align: center;
+      margin-bottom: 34px;
+      max-width: 872px;
+    }
+  }
+
+  h4 {
+    font-family: 'SFPD-Semibold';
+    font-size: 24px;
+    color: $black;
+  }
+
+  h5 {
+    font-family: 'SFPD-Regular';
+    font-size: 20px;
+    color: $dark;
+
+    &.half {
+      font-size: 22px;
+    }
+
+    span {
+      font-family: 'SFPD-Semibold';
+      color: $black;
+    }
+  }
+
+  .news-result-wrapper {
+    border: 1px dashed $dark;
+    padding: 16px;
+  }
 }
 
 .content-about {
