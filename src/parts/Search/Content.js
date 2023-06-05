@@ -5,15 +5,21 @@ import ICVectorDownBlue from '../../assets/images/vectordown.png';
 import ImgExample from '../../assets/images/urlvector.png';
 
 export default function Content() {
+  const [vectorDown, setVectorDown] = useState(ICVectorDownBlue);
   const [selectedOption, setSelectedOption] = useState('Portal Berita');
   const [showResult, setShowResult] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [jumlahBerita, setJumlahBerita] = useState('');
   const [nilaiKemiripan, setNilaiKemiripan] = useState('');
+  const [url, setURL] = useState('');
+  const [urlList, setURLList] = useState([]);
+  const [files, setFiles] = useState([]);
   const [searchWarning, setSearchWarning] = useState(false);
   const [jumlahBeritaWarning, setJumlahBeritaWarning] = useState(false);
   const [jumlahBeritaInfo, setJumlahBeritaInfo] = useState(false);
   const [nilaiKemiripanInfo, setNilaiKemiripanInfo] = useState(false);
+  const [urlWarning, setUrlWarning] = useState(false);
+  const [filesWarning, setFilesWarning] = useState(false);
 
   const colRef = useRef(null);
   const dividerRef1 = useRef(null);
@@ -45,7 +51,6 @@ export default function Content() {
     } else {
       setJumlahBeritaInfo(false);
     }
-    
   };
 
   const handleNilaiKemiripanChange = (event) => {
@@ -60,18 +65,49 @@ export default function Content() {
     }
   };
 
-  const calculateDefaultPercentage = () => {};
+  const handleTambahUrl = () => {
+    if (url.trim() !== '') {
+      // Store URL in the array
+      setURLList((prevURLList) => [...prevURLList, url]);
+
+      // Reset URL input field
+      setURL('');
+    }
+  };
+
+  const handleResetUrl = () => {
+    // Clear URL array value
+    setURLList([]);
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+  };
+
+  const handleResetDokumen = () => {
+    // Clear Dokumen array value
+    setFiles([]);
+  };
+
+  // const calculateDefaultPercentage = () => {};
 
   const handleOptionChange = (e) => {
     setSelectedOption(e.target.value);
+    setVectorDown(ICVectorDownBlue);
     setJumlahBerita('');
     setNilaiKemiripan('');
     setSearchValue('');
+    setURL('');
+    setURLList([]);
+    setFiles([]);
     setShowResult(false);
     setSearchWarning(false);
     setJumlahBeritaInfo(false);
     setJumlahBeritaWarning(false);
     setNilaiKemiripanInfo(false);
+    setUrlWarning(false);
+    setFilesWarning(false);
   };
 
   useEffect(() => {
@@ -83,12 +119,115 @@ export default function Content() {
     }
   }, [showResult]);
 
-  const handleToggleResultScreen = () => {
-    console.log('Search Value : ', searchValue, typeof searchValue);
-    console.log('Jumlah Berita : ', jumlahBerita, typeof jumlahBerita);
-    console.log('Nilai Kemiripan : ', nilaiKemiripan, typeof nilaiKemiripan);
-    setShowResult(true);
+  const handleToggleResultPortal = () => {
+    let hasError = false;
+    console.log('Ini Portal Berita');
+
+    if (searchValue.length === 0) {
+      setSearchWarning(true);
+      hasError = true;
+    }
+
+    if (jumlahBerita.length === 0) {
+      setJumlahBeritaWarning(true);
+      hasError = true;
+    }
+
+    if (nilaiKemiripan.length === 0) {
+      setNilaiKemiripanInfo(true);
+    }
+
+    setShowResult(false);
+    setVectorDown(ICVectorDownBlue);
+
+    if (!hasError) {
+      setVectorDown(ICVectorDownGray);
+      console.log('Search Value : ', searchValue, typeof searchValue);
+      console.log('Jumlah Berita : ', jumlahBerita, typeof jumlahBerita);
+      console.log('Nilai Kemiripan : ', nilaiKemiripan, typeof nilaiKemiripan);
+      setShowResult(true);
+    }
   };
+
+  const handleToggleResultUrl = () => {
+    let hasError = false;
+    console.log('Ini URL / Link');
+
+    if (searchValue.length === 0) {
+      setSearchWarning(true);
+      hasError = true;
+    }
+
+    if (nilaiKemiripan.length === 0) {
+      setNilaiKemiripanInfo(true);
+    }
+
+    if (urlList.length === 0) {
+      setUrlWarning(true);
+      hasError = true;
+    }
+
+    setShowResult(false);
+    setVectorDown(ICVectorDownBlue);
+
+    if (!hasError) {
+      setVectorDown(ICVectorDownGray);
+      console.log('Search Value : ', searchValue, typeof searchValue);
+      console.log('Nilai Kemiripan : ', nilaiKemiripan, typeof nilaiKemiripan);
+      console.log('List URL : ', urlList, typeof urlList);
+      setShowResult(true);
+    }
+  };
+
+  const handleToggleResultDokumen = () => {
+    let hasError = false;
+    console.log('Ini Dokumen');
+
+    if (searchValue.length === 0) {
+      setSearchWarning(true);
+      hasError = true;
+    }
+
+    if (nilaiKemiripan.length === 0) {
+      setNilaiKemiripanInfo(true);
+    }
+
+    if (files.length === 0) {
+      setFilesWarning(true);
+      hasError = true;
+    }
+
+    setShowResult(false);
+    setVectorDown(ICVectorDownBlue);
+
+    if (!hasError) {
+      setVectorDown(ICVectorDownGray);
+      console.log('Search Value : ', searchValue, typeof searchValue);
+      console.log('Nilai Kemiripan : ', nilaiKemiripan, typeof nilaiKemiripan);
+      console.log('List Dokumen : ', files, typeof files);
+      setShowResult(true);
+    }
+  };
+
+  const handleButtonTelusuri = () => {
+    if (selectedOption === 'Portal Berita') {
+      handleToggleResultPortal();
+    } else if (selectedOption === 'URL / Link') {
+      handleToggleResultUrl();
+    } else if (selectedOption === 'Dokumen') {
+      handleToggleResultDokumen();
+    }
+  };
+
+  let isButtonDisabled = true;
+
+  if (selectedOption === 'Portal Berita') {
+    isButtonDisabled = searchValue.length === 0 || jumlahBerita.length === 0;
+  } else if (selectedOption === 'URL / Link') {
+    isButtonDisabled = searchValue.length === 0 || urlList.length === 0;
+  } else if (selectedOption === 'Dokumen') {
+    isButtonDisabled = searchValue.length === 0;
+  }
 
   useEffect(() => {
     const colHeight = colRef.current.offsetHeight;
@@ -240,35 +379,57 @@ export default function Content() {
                   Jika tidak diisi maka nilai minimum berdasarkan sistem
                 </p>
               )}
-
             </div>
           </div>
+
           <div className="horizontal-divider mt-3"></div>
           <p className="mt-3">Masukkan URL / Link Berita</p>
-          <div className="row align-items-center">
-            <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8 col-xl-8">
+          <div className="row">
+            <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8 col-xl-8 mb-2">
               <div className="input-group">
                 <input
-                  className="form-control mb-2"
+                  className="form-control"
                   type="url"
                   placeholder="https://contoh.com"
+                  value={url}
+                  onChange={(e) => setURL(e.target.value)}
                 />
               </div>
+
+              {urlWarning && urlList.length === 0 && (
+                <p className="warning">
+                  Anda harus mengisi daftar URL/Link berita yang ingin dicari
+                </p>
+              )}
+
+              <div className="row" style={{ marginLeft: '0px' }}>
+                {urlList.map((urlItem, index) => (
+                  <p className="info" key={index}>
+                    {urlItem}
+                    {index !== urlList.length - 1 ? ', ' : ''}
+                  </p>
+                ))}
+              </div>
             </div>
+
             <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 mb-2">
-              <Button className="btn btn-add" onClick={onclick}>
+              <Button className="btn btn-add" onClick={handleTambahUrl}>
                 Tambah
               </Button>
             </div>
-            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
+
+            <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 mb-2">
               {/* deactive bisa dinyalakan dan tidak */}
-              <Button className="btn btn-reset deactive" onClick={onclick}>
+              <Button
+                className={`btn btn-reset ${
+                  urlList.length === 0 ? 'deactive' : ''
+                }`}
+                onClick={handleResetUrl}
+              >
                 Reset
               </Button>
             </div>
           </div>
-          {/* jangan lupa menambahkan warn */}
-          {/* jangan lupa menambahkan list berita yang udah di tambah */}
         </>
       );
     } else {
@@ -324,18 +485,42 @@ export default function Content() {
               )}
             </div>
           </div>
+
           <div className="horizontal-divider mt-3"></div>
           <p className="mt-3">Unggah Dokumen Berita</p>
-          <div className="row align-items-center">
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-              <input type="file" multiple className="btn btn-add mb-2" />
-              {/* <Button className="btn btn-add" onClick={onclick}>
-                Tambah
-              </Button> */}
+          <div className="row">
+            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 mb-2">
+              <input
+                type="file"
+                multiple
+                className="btn btn-add"
+                onChange={handleFileChange}
+              />
+
+              {filesWarning && files.length === 0 && (
+                <p className="warning">
+                  Anda harus menambahkan daftar Dokumen berita yang ingin dicari
+                </p>
+              )}
+
+              <div className="row" style={{ marginLeft: '0px' }}>
+                {files.map((file, index) => (
+                  <p className="info" key={index}>
+                    {file.name}
+                    {index !== files.length - 1 ? ', ' : ''}
+                  </p>
+                ))}
+              </div>
             </div>
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+
+            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 mb-2">
               {/* deactive bisa dinyalakan dan tidak */}
-              <Button className="btn btn-reset deactive" onClick={onclick}>
+              <Button
+                className={`btn btn-reset ${
+                  files.length === 0 ? 'deactive' : ''
+                }`}
+                onClick={handleResetDokumen}
+              >
                 Reset
               </Button>
             </div>
@@ -357,7 +542,7 @@ export default function Content() {
         <div className="col-auto"></div>
         <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1 col-xl-1 d-none d-md-block">
           <img
-            src={ICVectorDownBlue}
+            src={vectorDown}
             alt=""
             style={{ width: '100%', marginBottom: 24 }}
           />
@@ -378,8 +563,11 @@ export default function Content() {
             <div className="input-group-append">
               {/* deactive bisa dinyalakan dan tidak */}
               <Button
-                className="input-group-text deactive"
-                onClick={handleToggleResultScreen}
+                className={`input-group-text ${
+                  isButtonDisabled ? 'deactive' : ''
+                }`}
+                onClick={handleButtonTelusuri}
+                disabled={isButtonDisabled}
               >
                 Telusuri
               </Button>
