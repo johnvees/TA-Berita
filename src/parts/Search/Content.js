@@ -5,15 +5,73 @@ import ICVectorDownBlue from '../../assets/images/vectordown.png';
 import ImgExample from '../../assets/images/urlvector.png';
 
 export default function Content() {
-  const [selectedOption, setSelectedOption] = useState('portal berita');
+  const [selectedOption, setSelectedOption] = useState('Portal Berita');
   const [showResult, setShowResult] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [jumlahBerita, setJumlahBerita] = useState('');
+  const [nilaiKemiripan, setNilaiKemiripan] = useState('');
+  const [searchWarning, setSearchWarning] = useState(false);
+  const [jumlahBeritaWarning, setJumlahBeritaWarning] = useState(false);
+  const [jumlahBeritaInfo, setJumlahBeritaInfo] = useState(false);
+  const [nilaiKemiripanInfo, setNilaiKemiripanInfo] = useState(false);
+
   const colRef = useRef(null);
   const dividerRef1 = useRef(null);
   const dividerRef2 = useRef(null);
 
+  const handleSearchChange = (event) => {
+    setSearchValue(event.target.value);
+    if (event.target.value.length === 0) {
+      setSearchWarning(true);
+    } else {
+      setSearchWarning(false);
+    }
+  };
+
+  const handleJumlahBeritaChange = (event) => {
+    const inputValue = event.target.value;
+    if (!isNaN(inputValue) && inputValue <= 10) {
+      setJumlahBerita(inputValue);
+    }
+
+    if (event.target.value.length === 0) {
+      setJumlahBeritaWarning(true);
+    } else {
+      setJumlahBeritaWarning(false);
+    }
+
+    if (event.target.value.length !== 0) {
+      setJumlahBeritaInfo(true);
+    } else {
+      setJumlahBeritaInfo(false);
+    }
+    
+  };
+
+  const handleNilaiKemiripanChange = (event) => {
+    const inputValue = event.target.value;
+    if (!isNaN(inputValue) && inputValue <= 100) {
+      setNilaiKemiripan(inputValue);
+    }
+    if (event.target.value.length !== 0 || event.target.value.length === 0) {
+      setNilaiKemiripanInfo(true);
+    } else {
+      setNilaiKemiripanInfo(false);
+    }
+  };
+
+  const calculateDefaultPercentage = () => {};
+
   const handleOptionChange = (e) => {
     setSelectedOption(e.target.value);
+    setJumlahBerita('');
+    setNilaiKemiripan('');
+    setSearchValue('');
     setShowResult(false);
+    setSearchWarning(false);
+    setJumlahBeritaInfo(false);
+    setJumlahBeritaWarning(false);
+    setNilaiKemiripanInfo(false);
   };
 
   useEffect(() => {
@@ -26,6 +84,9 @@ export default function Content() {
   }, [showResult]);
 
   const handleToggleResultScreen = () => {
+    console.log('Search Value : ', searchValue, typeof searchValue);
+    console.log('Jumlah Berita : ', jumlahBerita, typeof jumlahBerita);
+    console.log('Nilai Kemiripan : ', nilaiKemiripan, typeof nilaiKemiripan);
     setShowResult(true);
   };
 
@@ -40,7 +101,7 @@ export default function Content() {
   }, []);
 
   const renderFilterContent = () => {
-    if (selectedOption === 'portal berita') {
+    if (selectedOption === 'Portal Berita') {
       return (
         <>
           <div className="row align-items-center justify-content-center">
@@ -51,9 +112,9 @@ export default function Content() {
                 value={selectedOption}
                 onChange={handleOptionChange}
               >
-                <option value="portal berita">Portal Berita</option>
-                <option value="url">URL / Link</option>
-                <option value="dokumen">Dokumen</option>
+                <option value="Portal Berita">Portal Berita</option>
+                <option value="URL / Link">URL / Link</option>
+                <option value="Dokumen">Dokumen</option>
               </select>
             </div>
 
@@ -68,12 +129,29 @@ export default function Content() {
               <p>Jumlah Berita yang Ditampilkan</p>
               <div className="input-group">
                 <input
-                  className="form-control"
+                  className={`form-control ${
+                    jumlahBeritaWarning ? 'input-warning' : ''
+                  }`}
                   type="number"
-                  placeholder="1"
-                  max="10"
+                  placeholder="2"
+                  value={jumlahBerita}
+                  onChange={handleJumlahBeritaChange}
+                  max={10}
+                  required
                 />
               </div>
+
+              {jumlahBeritaWarning && jumlahBerita.length === 0 && (
+                <p className="warning">
+                  Jumlah berita yang ingin ditampilkan harus diisi
+                </p>
+              )}
+
+              {jumlahBeritaInfo && jumlahBerita.length !== 0 && (
+                <p className="info">
+                  Saat ini layanan memiliki kapasitas maksimal sebanyak 10
+                </p>
+              )}
             </div>
 
             <div className="col-auto d-none d-lg-block">
@@ -87,17 +165,31 @@ export default function Content() {
                   className="form-control"
                   type="number"
                   placeholder="10"
-                  max="100"
+                  value={nilaiKemiripan}
+                  onChange={handleNilaiKemiripanChange}
+                  max={100}
                 />
                 <div className="input-group-append">
                   <span className="input-group-text persen">%</span>
                 </div>
               </div>
+
+              {nilaiKemiripanInfo && nilaiKemiripan.length === 0 && (
+                <p className="info">
+                  Jika tidak diisi maka nilai minimum berdasarkan sistem
+                </p>
+              )}
+
+              {nilaiKemiripanInfo && nilaiKemiripan.length !== 0 && (
+                <p className="info">
+                  Jika tidak diisi maka nilai minimum berdasarkan sistem
+                </p>
+              )}
             </div>
           </div>
         </>
       );
-    } else if (selectedOption === 'url') {
+    } else if (selectedOption === 'URL / Link') {
       return (
         <>
           <div className="row align-items-center">
@@ -108,9 +200,9 @@ export default function Content() {
                 value={selectedOption}
                 onChange={handleOptionChange}
               >
-                <option value="portal berita">Portal Berita</option>
-                <option value="url">URL / Link</option>
-                <option value="dokumen">Dokumen</option>
+                <option value="Portal Berita">Portal Berita</option>
+                <option value="URL / Link">URL / Link</option>
+                <option value="Dokumen">Dokumen</option>
               </select>
             </div>
 
@@ -128,12 +220,27 @@ export default function Content() {
                   className="form-control"
                   type="number"
                   placeholder="10"
-                  max="100"
+                  value={nilaiKemiripan}
+                  onChange={handleNilaiKemiripanChange}
+                  max={100}
                 />
                 <div className="input-group-append">
                   <span className="input-group-text persen">%</span>
                 </div>
               </div>
+
+              {nilaiKemiripanInfo && nilaiKemiripan.length === 0 && (
+                <p className="info">
+                  Jika tidak diisi maka nilai minimum berdasarkan sistem
+                </p>
+              )}
+
+              {nilaiKemiripanInfo && nilaiKemiripan.length !== 0 && (
+                <p className="info">
+                  Jika tidak diisi maka nilai minimum berdasarkan sistem
+                </p>
+              )}
+
             </div>
           </div>
           <div className="horizontal-divider mt-3"></div>
@@ -175,9 +282,9 @@ export default function Content() {
                 value={selectedOption}
                 onChange={handleOptionChange}
               >
-                <option value="portal berita">Portal Berita</option>
-                <option value="url">URL / Link</option>
-                <option value="dokumen">Dokumen</option>
+                <option value="Portal Berita">Portal Berita</option>
+                <option value="URL / Link">URL / Link</option>
+                <option value="Dokumen">Dokumen</option>
               </select>
             </div>
 
@@ -195,12 +302,26 @@ export default function Content() {
                   className="form-control"
                   type="number"
                   placeholder="10"
-                  max="100"
+                  value={nilaiKemiripan}
+                  onChange={handleNilaiKemiripanChange}
+                  max={100}
                 />
                 <div className="input-group-append">
                   <span className="input-group-text persen">%</span>
                 </div>
               </div>
+
+              {nilaiKemiripanInfo && nilaiKemiripan.length === 0 && (
+                <p className="info">
+                  Jika tidak diisi maka nilai minimum berdasarkan sistem
+                </p>
+              )}
+
+              {nilaiKemiripanInfo && nilaiKemiripan.length !== 0 && (
+                <p className="info">
+                  Jika tidak diisi maka nilai minimum berdasarkan sistem
+                </p>
+              )}
             </div>
           </div>
           <div className="horizontal-divider mt-3"></div>
@@ -246,9 +367,12 @@ export default function Content() {
         <div className="search-menu-wrapper rounded-lg">
           <div className="input-group">
             <input
-              className="form-control"
+              className={`form-control ${searchWarning ? 'input-warning' : ''}`}
               type="text"
+              value={searchValue}
+              onChange={handleSearchChange}
               placeholder="Masukkan Kata Kunci Pencarian"
+              required
             />
 
             <div className="input-group-append">
@@ -261,6 +385,12 @@ export default function Content() {
               </Button>
             </div>
           </div>
+
+          {searchWarning && searchValue.length === 0 && (
+            <p className="warning" style={{ marginLeft: '16px' }}>
+              Kata kunci pencarian harus diisi
+            </p>
+          )}
 
           <div className="search-filter-wrapper">{renderFilterContent()}</div>
         </div>
@@ -295,60 +425,22 @@ export default function Content() {
             <div className="row">
               <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
                 <img
-                className='mb-3'
+                  className="mb-3"
                   src={ImgExample}
                   alt=""
-                  style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }}
+                  style={{
+                    width: '100%',
+                    maxHeight: '200px',
+                    objectFit: 'cover',
+                  }}
                 />
               </div>
               <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                <h4 className='mb-3'>Judul Berita</h4>
-                <h5 className='mb-2'>
+                <h4 className="mb-3">Judul Berita</h4>
+                <h5 className="mb-2">
                   Persentase Kemiripan : <span>hasil %</span>
                 </h5>
-                <h5 className='mb-2'>
-                  Kata Kunci Berita : <span>hasil kata kunci</span>
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div className="news-result-wrapper rounded-lg mt-5">
-            <div className="row">
-              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                <img
-                className='mb-3'
-                  src={ImgExample}
-                  alt=""
-                  style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }}
-                />
-              </div>
-              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                <h4 className='mb-3'>Judul Berita</h4>
-                <h5 className='mb-2'>
-                  Persentase Kemiripan : <span>hasil %</span>
-                </h5>
-                <h5 className='mb-2'>
-                  Kata Kunci Berita : <span>hasil kata kunci</span>
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div className="news-result-wrapper rounded-lg mt-5">
-            <div className="row">
-              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                <img
-                className='mb-3'
-                  src={ImgExample}
-                  alt=""
-                  style={{ width: '100%', maxHeight: '200px', objectFit: 'cover' }}
-                />
-              </div>
-              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                <h4 className='mb-3'>Judul Berita</h4>
-                <h5 className='mb-2'>
-                  Persentase Kemiripan : <span>hasil %</span>
-                </h5>
-                <h5 className='mb-2'>
+                <h5 className="mb-2">
                   Kata Kunci Berita : <span>hasil kata kunci</span>
                 </h5>
               </div>
