@@ -229,6 +229,15 @@ export default function Content() {
     isButtonDisabled = searchValue.length === 0;
   }
 
+  let pJumlahBerita = '';
+  if (selectedOption === 'Portal Berita') {
+    pJumlahBerita = jumlahBerita + ' Berita';
+  } else if (selectedOption === 'URL / Link') {
+    pJumlahBerita = urlList.length + ' URL';
+  } else if (selectedOption === 'Dokumen') {
+    pJumlahBerita = files.length + ' Dokumen';
+  }
+
   useEffect(() => {
     const colHeight = colRef.current.offsetHeight;
     dividerRef1.current.style.height = `${colHeight}px`;
@@ -600,13 +609,16 @@ export default function Content() {
           </div>
 
           <h5 className="half mb-2">
-            Sumber Berita : <span>URL / Link</span>
+            Sumber Berita : <span>{selectedOption}</span>
           </h5>
           <h5 className="half mb-2">
-            Jumlah Berita yang Ditampilkan : <span>3 URLs</span>
+            Jumlah Berita yang Ditampilkan : <span>{pJumlahBerita}</span>
           </h5>
           <h5 className="half mb-2">
-            Minimum Persentase Kemiripan : <span>15%</span>
+            Minimum Persentase Kemiripan :{' '}
+            <span>
+              {nilaiKemiripan.length === 0 ? 'Default' : nilaiKemiripan + '%'}
+            </span>
           </h5>
 
           <div className="news-result-wrapper rounded-lg mt-5">
