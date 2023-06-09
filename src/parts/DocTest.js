@@ -1,19 +1,53 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react';
 import JSZip from 'jszip';
-import JSZipUtils from 'jszip-utils';
-import PizZip from 'pizzip';
-import { Document, Packer } from 'docx';
+import { Stemmer, Tokenizer } from 'sastrawijs';
+import natural from 'natural';
+import StopwordDictionary from '../utils/StopwordDictionary';
 
 export default function DocTest() {
-  const [selectedFiles, setSelectedFiles] = useState([]);
-  const [fileContent, setFileContent] = useState('');
+  const [fileContents, setFileContents] = useState([]);
+  const [fileNames, setFileNames] = useState([]);
+  const [sastrawi, setSastrawi] = useState([]);
+
+  const stemmer = new Stemmer();
+  const tokenizer = new Tokenizer();
 
   const handleFileSelect = async (event) => {
-    const file = event.target.files[0];
+    const files = event.target.files;
 
-    if (file) {
-      const result = await readTextFile(file);
-      setFileContent(result);
+    if (files.length > 0) {
+      const updatedFileContents = [...fileContents];
+      const updatedFileNames = [...fileNames];
+      const contents = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const result = await handleFileContent(file);
+
+        updatedFileContents.push(result.content);
+        updatedFileNames.push(result.name);
+
+        const content = await handleFileContent(file);
+        console.log('ini test before:', content.content);
+        const contentString = content.content.toString().toLowerCase();
+        console.log('ini test lowercase:', contentString);
+        const tokens = tokenizer.tokenize(contentString);
+        console.log('ini test token:', tokens);
+        const filteredWords = tokens.filter(
+          (word) => !StopwordDictionary.includes(word)
+        );
+        console.log('ini test filteredWords:', filteredWords);
+        const fileContents = [];
+        for (const word of filteredWords) {
+          fileContents.push(stemmer.stem(word));
+        }
+        console.log('ini test stemming:', fileContents);
+        contents.push(fileContents);
+      }
+
+      setSastrawi(contents);
+      setFileContents(updatedFileContents);
+      setFileNames(updatedFileNames);
     }
   };
 
@@ -23,7 +57,7 @@ export default function DocTest() {
     return new Promise((resolve, reject) => {
       reader.onload = (event) => {
         const content = event.target.result;
-        resolve(content);
+        resolve({ name: file.name, content });
       };
 
       reader.onerror = (event) => {
@@ -54,7 +88,7 @@ export default function DocTest() {
             text += textNodes[i].textContent;
           }
 
-          resolve(text);
+          resolve({ name: file.name, content: text });
         } catch (error) {
           reject(error);
         }
@@ -71,27 +105,41 @@ export default function DocTest() {
   const handleFileContent = async (file) => {
     if (file.name.endsWith('.docx')) {
       const result = await readDocxFile(file);
-      setFileContent(result);
+      return result;
     } else if (file.name.endsWith('.txt')) {
       const result = await readTextFile(file);
-      setFileContent(result);
+      return result;
     } else {
-      setFileContent('');
+      return { name: file.name, content: '' };
     }
+  };
+
+  const handleButton = () => {
+    console.log('List Dokumen : ', fileContents, typeof fileContents);
+    console.log(fileNames);
+    console.log(sastrawi);
   };
 
   return (
     <div>
       <input
         type="file"
+        multiple
         accept=".docx, .txt"
-        onChange={(e) => handleFileContent(e.target.files[0])}
+        onChange={handleFileSelect}
       />
 
       <div>
-        <h2>File Content:</h2>
-        <pre>{fileContent}</pre>
+        <h2>File Contents:</h2>
+        {fileContents.map((content, index) => (
+          <div key={index}>
+            <h3>{fileNames[index]}</h3>
+            <pre>{content}</pre>
+          </div>
+        ))}
       </div>
+
+      <button onClick={handleButton}>click</button>
     </div>
   );
 }
