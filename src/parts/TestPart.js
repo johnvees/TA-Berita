@@ -5,8 +5,8 @@ import axios from 'axios';
 export default function TestPart() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  // const [titles, setTitles] = useState([]);
-  // const [content, setContent] = useState([]);
+  const [titles, setTitles] = useState([]);
+  const [content, setContent] = useState([]);
 
   const handleSearch = async () => {
     const apiKey = 'AIzaSyAt2So-KHqquu50aUPv5TTjFVuM5FPYEqY';
@@ -24,6 +24,26 @@ export default function TestPart() {
     }
 
   };
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         'https://kalsel.prokal.co/read/news/50121-ada-dugaan-pungli-dinas-selisih-harga-bbm-nelayan-itu-karena-biaya-angkut.html',
+  //         { mode: 'no-cors' }
+  //       );
+
+  //       // Handle the opaque response here since you don't have access to the response data or headers
+
+  //       setTitles(['News title']); // Replace with appropriate value
+  //       setContent(['News content']); // Replace with appropriate value
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   // var url =
   //   'https://newsapi.org/v2/everything?' +
