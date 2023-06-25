@@ -13,6 +13,7 @@ export default function DocTest() {
   const [tfidf, setTfidf] = useState(null);
   const [newTerms, setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
+    const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
   const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
   const [documentSimilarity, setDocumentSimilarity] = useState(null);
   const [similarDocuments, setSimilarDocuments] = useState([]);
@@ -254,17 +255,18 @@ export default function DocTest() {
       );
       setTfidfWithZeros(tfidfWithZerosForAllDocuments);
       // calculateDocumentSimilarity(tfidfWithZerosForAllDocuments);
+      handleLSA(tfidfWithZerosForAllDocuments);
     }
   };
 
-  const handleLSA = () => {
+  const handleLSA = (values) => {
     // Step 1: Compute TF-IDF weights (Already computed in tfidfWeights)
-
+    console.log(values);
     // Step 2: Create the Term-Document Matrix
-    const terms = Object.keys(tfidfWithZeros[0]); // Get the terms from the first document
+    const terms = Object.keys(values[0]); // Get the terms from the first document
     console.log(terms);
-    console.log(tfidfWithZeros);
-    const tfidfLength = Object.keys(tfidfWithZeros);
+    console.log(values);
+    const tfidfLength = Object.keys(values);
     console.log(tfidfLength);
     console.log(tfidfLength.length);
     const termDocumentMatrix = [];
@@ -273,8 +275,8 @@ export default function DocTest() {
       const termVector = [];
 
       for (let i = 0; i < tfidfLength.length; i++) {
-        if (tfidfWithZeros[i].hasOwnProperty(term)) {
-          termVector.push(tfidfWithZeros[i][term]);
+        if (values[i].hasOwnProperty(term)) {
+          termVector.push(values[i][term]);
         } else {
           termVector.push(0);
         }
@@ -444,11 +446,28 @@ export default function DocTest() {
       );
     });
 
+    const arraySimilarity = filteredSimilarityMatrix.filter(
+      (item) => item.length !== 0
+    );
+
+    setNonEmptySimilarity(arraySimilarity);
+
+    arraySimilarity.forEach((item, index) => {
+      console.log(`Value ${index}: ${item[0]}`);
+    });
+
     console.log('Highest Similarity:', maxSimilarity);
     console.log('Lowest Similarity:', minSimilarity);
     console.log('Average Similarity:', averageSimilarity);
+    console.log(filteredSimilarityMatrix);
+    console.log(filteredSimilarityMatrix.filter((item) => item.length !== 0));
 
     setDocumentSimilarity(filteredSimilarityMatrix);
+  };
+
+  const handleButtonClick = () => {
+    calculateTfidfForAllDocuments();
+    // handleLSA();
   };
 
   return (
@@ -530,6 +549,11 @@ export default function DocTest() {
           </ul>
         )}
       </div>
+
+      <button onClick={handleButtonClick}>Calculate LSA</button>
+      {nonEmptySimilarity.map((item, index) => (
+        <li key={index}>Similarity {item[0]}</li>
+      ))}
     </div>
   );
 }

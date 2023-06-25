@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import cheerio from 'cheerio';
 
 export default function TestPart() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [titles, setTitles] = useState([]);
-  const [content, setContent] = useState([]);
+  const [berita, setBerita] = useState([]);
+  const [judul, setJudul] = useState([]);
+  const [isis, setIsi] = useState([]);
+  const [body, setBody] = useState({
+    judul: [],
+    isi: [],
+    date: [],
+    imageUrl: [],
+    link: [],
+  });
 
   const handleSearch = async () => {
     const apiKey = 'AIzaSyAt2So-KHqquu50aUPv5TTjFVuM5FPYEqY';
@@ -22,14 +29,75 @@ export default function TestPart() {
     } catch (error) {
       console.error('Error fetching search results:', error);
     }
+  };
 
+  const grabNewsData = async () => {
+    const response = await axios.get(
+      'https://berita-indo-api.vercel.app/v1/cnn-news'
+    );
+    console.log('grab data', response.data.data);
+    console.log('grab image', response.data.data[0].image.small);
+    setBerita(response.data.data);
+    // setBody({
+    //   judul: response.data.data.map((obj) => obj.title),
+    //   isi: response.data.data.map((obj) => obj.contentSnippet),
+    //   date: response.data.data.map((obj) => obj.isoDate),
+    //   imageUrl: response.data.data.map((obj) => obj.image.small),
+    //   url: response.data.data.map((obj) => obj.link),
+    // });
+    setJudul({
+      jenis: response.data.data[0].title,
+    });
+    setBody({
+      judul: response.data.data[0].title,
+      isi: response.data.data[0].contentSnippet,
+      date: response.data.data[0].isoDate,
+      imageUrl: response.data.data[0].image.small,
+      url: response.data.data[0].link,
+    });
+    // const body = {
+    //   judul: berita.title,
+    //   isi: berita.contentSnippet,
+    //   date: berita.isoDate,
+    //   // imageUrl: berita.image.small,
+    //   url: berita.link,
+    // };
+    // console.log(body);
+  };
+
+  const postNewsData = async () => {
+    console.log(body);
+    // const response = await axios.post(
+    //   'https://ta-berita-server.up.railway.app/api/v1/list-berita',
+    //   body
+    // );
+    const response = await axios.port(
+      'http://localhost:3001/api/v1/add-kategori',
+      judul
+    );
   };
 
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
   //       const response = await axios.get(
-  //         'https://kalsel.prokal.co/read/news/50121-ada-dugaan-pungli-dinas-selisih-harga-bbm-nelayan-itu-karena-biaya-angkut.html',
+  //         'https://ta-berita-server.up.railway.app/api/v1/list-berita'
+  //       );
+
+  //       console.log(response.data.berita);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         'https://berita-indo-api.vercel.app/v1/cnn-news',
   //         { mode: 'no-cors' }
   //       );
 
@@ -37,6 +105,54 @@ export default function TestPart() {
 
   //       setTitles(['News title']); // Replace with appropriate value
   //       setContent(['News content']); // Replace with appropriate value
+  //       console.log(response.data.data);
+  //       console.log(response.data.data[0].title);
+  //       console.log(response.data.data[0].contentSnippet);
+  //       const isoDate = response.data.data[0].isoDate;
+  //       const parsedDate = new Date(isoDate);
+  //       const year = parsedDate.getUTCFullYear();
+  //       const month = parsedDate.getUTCMonth() + 1; // Adding 1 because month is zero-indexed
+  //       const day = parsedDate.getUTCDate();
+  //       // console.log(
+  //       //   `${year}-${month.toString().padStart(2, '0')}-${day
+  //       //     .toString()
+  //       //     .padStart(2, '0')}`
+  //       // ); // Output: 2023-06-21
+  //       const dateConcat = `${year}-${month.toString().padStart(2, '0')}-${day
+  //         .toString()
+  //         .padStart(2, '0')}`;
+  //       console.log(dateConcat);
+  //       console.log(response.data.data[0].link);
+  //       console.log(response.data.data[0].image.small);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         'https://api.nytimes.com/svc/search/v2/articlesearch.json',
+  //         {
+  //           params: {
+  //             q: 'republican voter fraud eric',
+  //             'api-key': 'PpK79TmWkTYpcvWi9NKxp4b8hdgczzFq',
+  //           },
+  //         }
+  //       );
+
+  //       // Handle the response data here
+  //       const articles = response.data.response.docs;
+  //       const titles = articles.map((article) => article.headline.main);
+  //       const content = articles.map((article) => article.abstract);
+
+  //       console.log(articles);
+  //       setTitles(titles);
+  //       setContent(content);
   //     } catch (error) {
   //       console.error('Error fetching data:', error);
   //     }
@@ -59,6 +175,18 @@ export default function TestPart() {
 
   return (
     <div>
+      <button onClick={postNewsData}>Post APi</button>
+      <button onClick={grabNewsData}>Grab APi</button>
+      {/* {berita.length > 0 && (
+        <div>
+          {berita.map((item) => (
+            <div key={item.link}>
+              <p>{item.title}</p>
+            </div>
+          ))}
+        </div>
+      )} */}
+
       <input
         type="text"
         value={query}

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TestPart from '../parts/TestPart';
 import DocTest from '../parts/DocTest';
+import AnotherTest from '../parts/AnotherTest';
 
 export default class TestPage extends Component {
   render() {
@@ -8,6 +9,7 @@ export default class TestPage extends Component {
       <>
         <TestPart></TestPart>
         <DocTest></DocTest>
+        <AnotherTest></AnotherTest>
       </>
     );
   }
