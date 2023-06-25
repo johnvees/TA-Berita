@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import JSZip, { file } from 'jszip';
 import { Stemmer, Tokenizer } from 'sastrawijs';
-import numeric from 'numeric';
+import numeric, { log } from 'numeric';
 import StopwordDictionary from '../../utils/StopwordDictionary';
 import Button from '../../elements/Button';
 import ICVectorDownGray from '../../assets/images/vectordowngray.png';
 import ICVectorDownBlue from '../../assets/images/vectordown.png';
 import ImgExample from '../../assets/images/urlvector.png';
+import { OutlineLevel } from 'docx';
 
 export default function Content() {
   const [vectorDown, setVectorDown] = useState(ICVectorDownBlue);
@@ -22,10 +23,14 @@ export default function Content() {
   const [files, setFiles] = useState([]);
   const [fileContents, setFileContents] = useState([]);
   const [fileNames, setFileNames] = useState([]);
+  const [beforeSastrawi, setBeforeSastrawi] = useState([]);
   const [sastrawi, setSastrawi] = useState([]);
   const [newTerms, setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
+  const [allTermsOld, setAllTermsOld] = useState([]);
   const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
+  const [resultSVD, setResultSVD] = useState([]);
+  const [maxValues, setMaxValues] = useState([]);
   const [showResult, setShowResult] = useState(false);
   const [searchWarning, setSearchWarning] = useState(false);
   const [jumlahBeritaWarning, setJumlahBeritaWarning] = useState(false);
@@ -33,6 +38,9 @@ export default function Content() {
   const [nilaiKemiripanInfo, setNilaiKemiripanInfo] = useState(false);
   const [urlWarning, setUrlWarning] = useState(false);
   const [filesWarning, setFilesWarning] = useState(false);
+  const [ilNull, setIlNull] = useState(
+    'https://dummyimage.com/600x400/e0e0e0/000000.png&text=No+Image'
+  );
 
   const colRef = useRef(null);
   const dividerRef1 = useRef(null);
@@ -106,6 +114,7 @@ export default function Content() {
       const updatedFileContents = [...fileContents];
       const updatedFileNames = [...fileNames];
       const contents = [];
+      const newTerms = [];
 
       const searchQuery = searchValue;
 
@@ -160,6 +169,7 @@ export default function Content() {
         // contents.push(mergedContents);
 
         contents.push(fileContents);
+        newTerms.push(tokens);
       }
 
       const mergedContents = [...queryContent, ...fileContents];
@@ -167,6 +177,7 @@ export default function Content() {
       console.log('merged content', mergedContents);
 
       setSastrawi(contents);
+      setBeforeSastrawi(newTerms);
       console.log('sastrawi + text ', contents);
       setFileContents(updatedFileContents);
       setFileNames(updatedFileNames);
@@ -177,6 +188,7 @@ export default function Content() {
     if (sastrawi.length > 0) {
       // Build the term-document matrix
       const { termDocumentMatrix, terms } = buildTermDocumentMatrix(sastrawi);
+      const { termDocumentMatrixx, termss } = saveNewTerms(beforeSastrawi);
       setNewTerms(terms);
       setAllTerms([...allTerms, ...terms]);
 
@@ -184,7 +196,32 @@ export default function Content() {
       const tfidfWeights = calculateTfidf(termDocumentMatrix);
       setTfidf(tfidfWeights);
     }
-  }, [sastrawi]);
+  }, [sastrawi, beforeSastrawi]);
+
+  const saveNewTerms = (values) => {
+    const termDocumentMatrixx = {};
+    const termss = [];
+
+    values.forEach((document, documentIndex) => {
+      document.forEach((term) => {
+        if (!termDocumentMatrixx.hasOwnProperty(term)) {
+          termDocumentMatrixx[term] = {};
+          termss.push(term);
+        }
+
+        if (!termDocumentMatrixx[term].hasOwnProperty(documentIndex)) {
+          termDocumentMatrixx[term][documentIndex] = 0;
+        }
+
+        termDocumentMatrixx[term][documentIndex]++;
+        // console.log('term document matrix : ', termDocumentMatrix);
+      });
+    });
+
+    console.log('terms baru: ', termss);
+    setAllTermsOld(termss);
+    return { termDocumentMatrixx, termss };
+  };
 
   const buildTermDocumentMatrix = (documents) => {
     const termDocumentMatrix = {};
@@ -362,6 +399,27 @@ export default function Content() {
 
     console.log('ini transpose v:', transposeV);
     console.log('result diag x V :', resultDiagxV);
+    // setResultSVD(resultDiagxV);
+
+    const maxValues = [];
+
+    for (let i = 0; i < resultDiagxV[0].length; i++) {
+      const column = resultDiagxV.map((row, rowIndex) => ({
+        value: row[i],
+        index: rowIndex,
+      }));
+      column.sort((a, b) => b.value - a.value);
+      const maxTwoValues = column.slice(0, 5);
+      maxValues.push(maxTwoValues);
+    }
+
+    maxValues.map((values, index) =>
+      values.map((values, index) => console.log(allTermsOld[values.index]))
+    );
+
+    setMaxValues(maxValues);
+
+    console.log(maxValues);
 
     const updatedMatrix = resultDiagxV.map((row) =>
       row.map((value) => (value < 0 ? -value : value))
@@ -369,7 +427,7 @@ export default function Content() {
 
     console.log(updatedMatrix);
 
-    calculateDocumentSimilarity(updatedMatrix);
+    calculateDocumentSimilarity(resultDiagxV);
   };
 
   const calculateDocumentSimilarity = (values) => {
@@ -465,7 +523,9 @@ export default function Content() {
 
     console.log('Highest Similarity:', maxSimilarity);
     console.log('Lowest Similarity:', minSimilarity);
-    console.log('Average Similarity:', averageSimilarity);
+    console.log('Threshold Similarity:', averageSimilarity);
+    console.log('filtered similarity:', filteredSimilarityMatrix);
+    console.log('array similarity:', arraySimilarity);
 
     setDocumentSimilarity(filteredSimilarityMatrix);
   };
@@ -654,6 +714,7 @@ export default function Content() {
       console.log('Search Value : ', searchValue, typeof searchValue);
       console.log('Nilai Kemiripan : ', nilaiKemiripan, typeof nilaiKemiripan);
       console.log('List Dokumen : ', files, typeof files);
+      console.log('All Terms Before', allTermsOld);
       setShowResult(true);
     }
   };
@@ -894,7 +955,8 @@ export default function Content() {
       return (
         <>
           <div className="row align-items-center">
-            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 mb-2">
+            {/* jangan lupa diganti responsive bootstrap nya jika ingin memunculkan nilai minimum kemiripan */}
+            <div className="col-xs col-sm col-md col-lg col-xl mb-2">
               <p>Sumber Berita</p>
               <select
                 className="custom-select"
@@ -907,13 +969,16 @@ export default function Content() {
               </select>
             </div>
 
+            {/* jangan lupa menghapus hidden */}
             <div className="col-auto d-none d-lg-block">
-              <div ref={dividerRef1} className="vertical-divider"></div>
+              <div ref={dividerRef1} className="vertical-divider" hidden></div>
             </div>
 
+            {/* jangan lupa menghapus hidden */}
             <div
               ref={colRef}
               className="col-xs-6 col-sm-6 col-md-6 col-lg-5 col-xl-5 mb-2"
+              hidden
             >
               <p>Minimum Persentase Kemiripan</p>
               <div className="input-group">
@@ -1070,30 +1135,53 @@ export default function Content() {
             </span>
           </h5>
 
-          <div className="news-result-wrapper rounded-lg mt-5">
-            <div className="row">
-              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                <img
-                  className="mb-3"
-                  src={ImgExample}
-                  alt=""
-                  style={{
-                    width: '100%',
-                    maxHeight: '200px',
-                    objectFit: 'cover',
-                  }}
-                />
-              </div>
-              <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                <h4 className="mb-3">Judul Berita</h4>
-                <h5 className="mb-2">
-                  Persentase Kemiripan : <span>hasil %</span>
-                </h5>
-                <h5 className="mb-2">
-                  Kata Kunci Berita : <span>hasil kata kunci</span>
-                </h5>
-              </div>
-            </div>
+          <div>
+            {documentSimilarity.length > 0 &&
+              documentSimilarity.map((item, index) => {
+                if (item.length > 0) {
+                  const fileName = fileNames[index]; // Assuming 'fileNames' is the state containing the file names
+                  const keywords = maxValues[index];
+                  const similarityPercentage = item[0]; // Assuming the similarity value is at index 0
+                  const formattedKeywords = keywords.map(
+                    (values, index) => allTermsOld[values.index]
+                  );
+                  // const keyword = keywords[index]; // Assuming 'keywords' is the state containing the keywords
+
+                  return (
+                    <div
+                      key={index}
+                      className="news-result-wrapper rounded-lg mt-5"
+                    >
+                      <div className="row">
+                        <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                          <img
+                            className="mb-3"
+                            src={ilNull}
+                            alt=""
+                            style={{
+                              width: '100%',
+                              maxHeight: '200px',
+                              objectFit: 'cover',
+                            }}
+                          />
+                        </div>
+                        <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                          <h4 className="mb-3">{fileName}</h4>
+                          <h5 className="mb-2">
+                            Persentase Kemiripan :{' '}
+                            <span>{similarityPercentage}%</span>
+                          </h5>
+                          <h5 className="mb-2">
+                            Kata Kunci Berita :
+                            <span>{formattedKeywords.join(', ')}</span>
+                          </h5>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })}
           </div>
         </div>
       )}

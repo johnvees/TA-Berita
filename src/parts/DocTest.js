@@ -13,7 +13,9 @@ export default function DocTest() {
   const [tfidf, setTfidf] = useState(null);
   const [newTerms, setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
-    const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
+  const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
+  const [similarFiles, setSimilarFiles] = useState([]);
+  const [thresholdSimilarity, setThresholdSimilarity] = useState(0);
   const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
   const [documentSimilarity, setDocumentSimilarity] = useState(null);
   const [similarDocuments, setSimilarDocuments] = useState([]);
@@ -80,11 +82,6 @@ export default function DocTest() {
           fileContents.push(stemmer.stem(word));
         }
         console.log('ini test stemming:', fileContents);
-
-        // const mergedContents = [queryContent, ...fileContents]; // Place textFileContents at the first index
-        // console.log('merged content', mergedContents);
-        // contents.push(mergedContents);
-
         contents.push(fileContents);
       }
 
@@ -94,6 +91,7 @@ export default function DocTest() {
 
       setSastrawi(contents);
       console.log('sastrawi + text ', contents);
+      console.log('file names', updatedFileNames);
       setFileContents(updatedFileContents);
       setFileNames(updatedFileNames);
     }
@@ -391,49 +389,6 @@ export default function DocTest() {
       similarities.push(similarity);
 
       similarityMatrix.push(similarities);
-
-      // for (let j = 0; j < documentCount; j++) {
-      //   if (i === j) {
-      //     similarities.push(100); // Self-similarity is 100%
-      //     continue;
-      //   }
-
-      //   const tfidf1 = Object.values(values[i]);
-      //   const tfidf2 = Object.values(values[j]);
-
-      //   // const dotProduct = tfidf1.reduce(
-      //   //   (sum, value, index) => sum + value * tfidf2[index],
-      //   //   0
-      //   // );
-      //   // const magnitude1 = Math.sqrt(
-      //   //   tfidf1.reduce((sum, value) => sum + value ** 2, 0)
-      //   // );
-      //   // const magnitude2 = Math.sqrt(
-      //   //   tfidf2.reduce((sum, value) => sum + value ** 2, 0)
-      //   // );
-
-      //   // similarities.push(
-      //   //   Math.round((dotProduct / (magnitude1 * magnitude2)) * 100)
-      //   // );
-
-      //   let dotProduct = 0;
-      //   let magnitude1 = 0;
-      //   let magnitude2 = 0;
-
-      //   for (let k = 0; k < tfidf1.length; k++) {
-      //     dotProduct += tfidf1[k] * tfidf2[k];
-      //     magnitude1 += tfidf1[k] ** 2;
-      //     magnitude2 += tfidf2[k] ** 2;
-      //   }
-
-      //   magnitude1 = Math.sqrt(magnitude1);
-      //   magnitude2 = Math.sqrt(magnitude2);
-
-      //   const similarity = Math.round(
-      //     (dotProduct / (magnitude1 * magnitude2)) * 100
-      //   );
-      //   similarities.push(similarity);
-      // }
     }
 
     const maxSimilarity = Math.max(...similarityMatrix.flat());
@@ -451,6 +406,7 @@ export default function DocTest() {
     );
 
     setNonEmptySimilarity(arraySimilarity);
+    setThresholdSimilarity(averageSimilarity);
 
     arraySimilarity.forEach((item, index) => {
       console.log(`Value ${index}: ${item[0]}`);
@@ -458,16 +414,16 @@ export default function DocTest() {
 
     console.log('Highest Similarity:', maxSimilarity);
     console.log('Lowest Similarity:', minSimilarity);
-    console.log('Average Similarity:', averageSimilarity);
-    console.log(filteredSimilarityMatrix);
-    console.log(filteredSimilarityMatrix.filter((item) => item.length !== 0));
+    console.log('threshold Similarity:', averageSimilarity);
+    console.log('filtered similarity', filteredSimilarityMatrix);
+    console.log(' array similarity', arraySimilarity);
+    console.log('file name', fileNames);
 
     setDocumentSimilarity(filteredSimilarityMatrix);
   };
 
   const handleButtonClick = () => {
     calculateTfidfForAllDocuments();
-    // handleLSA();
   };
 
   return (
