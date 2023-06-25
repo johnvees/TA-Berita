@@ -71,7 +71,7 @@ export default function TestPart() {
     //   'https://ta-berita-server.up.railway.app/api/v1/list-berita',
     //   body
     // );
-    const response = await axios.port(
+    const response = await axios.post(
       'http://localhost:3001/api/v1/add-kategori',
       judul
     );

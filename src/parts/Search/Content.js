@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import JSZip, { file } from 'jszip';
+import JSZip from 'jszip';
 import { Stemmer, Tokenizer } from 'sastrawijs';
-import numeric, { log } from 'numeric';
+import numeric from 'numeric';
+import axios from 'axios';
 import StopwordDictionary from '../../utils/StopwordDictionary';
 import Button from '../../elements/Button';
 import ICVectorDownGray from '../../assets/images/vectordowngray.png';
 import ICVectorDownBlue from '../../assets/images/vectordown.png';
-import ImgExample from '../../assets/images/urlvector.png';
-import { OutlineLevel } from 'docx';
 
 export default function Content() {
   const [vectorDown, setVectorDown] = useState(ICVectorDownBlue);
@@ -31,6 +30,7 @@ export default function Content() {
   const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
   const [resultSVD, setResultSVD] = useState([]);
   const [maxValues, setMaxValues] = useState([]);
+  const [grabKategori, setGrabKategori] = useState([]);
   const [showResult, setShowResult] = useState(false);
   const [searchWarning, setSearchWarning] = useState(false);
   const [jumlahBeritaWarning, setJumlahBeritaWarning] = useState(false);
@@ -754,8 +754,17 @@ export default function Content() {
     dividerRef2.current.style.height = `${colHeight}px`;
   }, []);
 
+  const ambilKategori = async () => {
+    const response = await axios.get(
+      'https://ta-berita-server.up.railway.app/api/v1/list-kategori'
+    );
+    console.log(response.data.kategori);
+    setGrabKategori(response.data.kategori);
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    ambilKategori();
   }, []);
 
   const renderFilterContent = () => {
@@ -770,9 +779,11 @@ export default function Content() {
                 value={selectedOption}
                 onChange={handleOptionChange}
               >
-                <option value="Portal Berita">Portal Berita</option>
-                <option value="URL / Link">URL / Link</option>
-                <option value="Dokumen">Dokumen</option>
+                {grabKategori.map((values, index) => (
+                  <option key={index} value={values.jenis}>
+                    {values.jenis}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -858,9 +869,11 @@ export default function Content() {
                 value={selectedOption}
                 onChange={handleOptionChange}
               >
-                <option value="Portal Berita">Portal Berita</option>
-                <option value="URL / Link">URL / Link</option>
-                <option value="Dokumen">Dokumen</option>
+                {grabKategori.map((values, index) => (
+                  <option key={index} value={values.jenis}>
+                    {values.jenis}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -963,9 +976,11 @@ export default function Content() {
                 value={selectedOption}
                 onChange={handleOptionChange}
               >
-                <option value="Portal Berita">Portal Berita</option>
-                <option value="URL / Link">URL / Link</option>
-                <option value="Dokumen">Dokumen</option>
+                {grabKategori.map((values, index) => (
+                  <option key={index} value={values.jenis}>
+                    {values.jenis}
+                  </option>
+                ))}
               </select>
             </div>
 
