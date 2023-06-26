@@ -1,44 +1,119 @@
 import React, { useState, useEffect } from 'react';
-import JSZip from 'jszip';
+import axios from 'axios';
 import { Stemmer, Tokenizer } from 'sastrawijs';
 import numeric from 'numeric';
-import cosineSimilarity from 'cosine-similarity';
 import StopwordDictionary from '../utils/StopwordDictionary';
 
-export default function DocTest() {
-  const [fileContents, setFileContents] = useState([]);
-  const [fileNames, setFileNames] = useState([]);
-  const [query, setQuery] = useState('');
-  const [sastrawi, setSastrawi] = useState([]);
+export default function NewsTest() {
+  const [searchValue, setSearchValue] = useState('');
+  const [kemiripan, setKemiripan] = useState(0);
+  const [jumlahBerita, setJumlahBerita] = useState(0);
+  const [newsData, setNewsData] = useState([
+    { judul: '', isi: '', date: '', imageUrl: '', link: '' },
+  ]);
+  const [thresholdSimilarity, setThresholdSimilarity] = useState(0);
   const [tfidf, setTfidf] = useState(null);
+  const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
+  const [documentSimilarity, setDocumentSimilarity] = useState([]);
+  const [sastrawi, setSastrawi] = useState([]);
+  const [beforeSastrawi, setBeforeSastrawi] = useState([]);
   const [newTerms, setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
+  const [allTermsOld, setAllTermsOld] = useState([]);
   const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
-  const [thresholdSimilarity, setThresholdSimilarity] = useState(0);
-  const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
-  const [documentSimilarity, setDocumentSimilarity] = useState(null);
-  const [similarDocuments, setSimilarDocuments] = useState([]);
+  const [newsContents, setNewsContents] = useState([]);
+  const [titlenContent, setTitlenContent] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [maxValues, setMaxValues] = useState([]);
+  const [searchIndex, setSearchIndex] = useState([]);
 
   const stemmer = new Stemmer();
   const tokenizer = new Tokenizer();
 
-  const handleInputChange = (event) => {
-    const value = event.target.value;
-    setQuery(value);
+  const grabNewsData = async () => {
+    const response = await axios.get(
+      'https://ta-berita-server.up.railway.app/api/v1/list-berita'
+    );
+
+    const collectNewsData = [];
+    const judulDanIsi = [];
+
+    console.log(response.data.berita);
+    for (let index = 0; index < response.data.berita.length; index++) {
+      const dataBerita = {
+        judul: response.data.berita[index].judul,
+        isi: response.data.berita[index].isi,
+        date: response.data.berita[index].date,
+        imageUrl: response.data.berita[index].imageUrl,
+        link: response.data.berita[index].link,
+      };
+      //   console.log(dataBerita);
+      collectNewsData.push(dataBerita);
+      judulDanIsi.push(dataBerita.judul + ' ' + dataBerita.isi);
+    }
+
+    const newsDataWithJudulDanIsi = collectNewsData.map((data, index) => ({
+      ...data,
+      judulDanIsi: judulDanIsi[index],
+    }));
+    console.log(newsDataWithJudulDanIsi);
+    setNewsData(newsDataWithJudulDanIsi);
+
+    setTitlenContent(judulDanIsi);
+    // setNewsData(collectNewsData);
   };
 
-  const handleFileSelect = async (event) => {
-    const files = event.target.files;
+  useEffect(() => {
+    grabNewsData();
+  }, []);
 
-    if (files.length > 0) {
-      const updatedFileContents = [...fileContents];
-      const updatedFileNames = [...fileNames];
+  const handleQueryChange = (event) => {
+    const inputValue = event.target.value;
+    setSearchValue(inputValue);
+  };
+
+  const handleKemiripanChange = (event) => {
+    setKemiripan(event.target.value);
+  };
+
+  const handleJumlahBeritaChange = (event) => {
+    setJumlahBerita(event.target.value);
+  };
+
+  const handleOnClick = () => {
+    calculateTfidfForAllDocuments();
+  };
+
+  const handleSearch = () => {
+    console.log(titlenContent);
+    const query = searchValue.toLowerCase();
+
+    const filteredIndices = [];
+    const results = titlenContent.filter((item, index) => {
+      const includesQuery = item.toLowerCase().includes(query);
+      if (includesQuery) {
+        filteredIndices.push(index);
+      }
+      return includesQuery;
+    });
+
+    console.log(results);
+    console.log(filteredIndices);
+    setSearchIndex(filteredIndices);
+
+    const filteredNewsData = filteredIndices.map((index) => newsData[index]);
+
+    console.log(filteredNewsData);
+    setSearchResults(results);
+    // Perform the search based on the searchQuery and your own data
+
+    if (results.length > 0) {
+      const updatedNewsContent = [...newsContents];
       const contents = [];
-
-      const searchQuery = query;
+      const newTerms = [];
 
       //text preprocessing query content
-      const queryContentString = searchQuery.toString().toLowerCase();
+      const queryContentString = searchValue.toString().toLowerCase();
 
       const queryTokens = tokenizer.tokenize(queryContentString);
       console.log('test token query', queryTokens);
@@ -54,18 +129,12 @@ export default function DocTest() {
 
       console.log('Query Content', queryContent);
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const result = await handleFileContent(file);
+      for (let i = 0; i < results.length; i++) {
+        const content = results[i];
 
-        updatedFileContents.push(result.content);
-        updatedFileNames.push(result.name);
+        updatedNewsContent.push(content);
 
-        // text preprocessing file content
-        const content = await handleFileContent(file);
-        console.log('ini test before:', content.content);
-
-        const contentString = content.content.toString().toLowerCase();
+        const contentString = content.toString().toLowerCase();
         console.log('ini test lowercase:', contentString);
 
         const tokens = tokenizer.tokenize(contentString);
@@ -76,86 +145,22 @@ export default function DocTest() {
         );
         console.log('ini test filteredWords:', filteredWords);
 
-        const fileContents = [];
+        const newsContents = [];
         for (const word of filteredWords) {
-          fileContents.push(stemmer.stem(word));
+          newsContents.push(stemmer.stem(word));
         }
-        console.log('ini test stemming:', fileContents);
-        contents.push(fileContents);
+        console.log('ini test stemming:', newsContents);
+        contents.push(newsContents);
+        newTerms.push(tokens);
       }
 
-      const mergedContents = [...queryContent, ...fileContents];
+      const mergedContents = [...queryContent, ...newsContents];
       contents.push(mergedContents);
       console.log('merged content', mergedContents);
 
       setSastrawi(contents);
+      setBeforeSastrawi(newTerms);
       console.log('sastrawi + text ', contents);
-      console.log('file names', updatedFileNames);
-      setFileContents(updatedFileContents);
-      setFileNames(updatedFileNames);
-    }
-  };
-
-  const readTextFile = async (file) => {
-    const reader = new FileReader();
-
-    return new Promise((resolve, reject) => {
-      reader.onload = (event) => {
-        const content = event.target.result;
-        resolve({ name: file.name, content });
-      };
-
-      reader.onerror = (event) => {
-        reject(event.target.error);
-      };
-
-      reader.readAsText(file);
-    });
-  };
-
-  const readDocxFile = async (file) => {
-    const reader = new FileReader();
-
-    return new Promise((resolve, reject) => {
-      reader.onload = async (event) => {
-        const arrayBuffer = event.target.result;
-
-        try {
-          const zip = await JSZip.loadAsync(arrayBuffer);
-          const contentXml = await zip
-            .file('word/document.xml')
-            .async('string');
-          const doc = new DOMParser().parseFromString(contentXml, 'text/xml');
-          const textNodes = doc.getElementsByTagName('w:t');
-          let text = '';
-
-          for (let i = 0; i < textNodes.length; i++) {
-            text += textNodes[i].textContent;
-          }
-
-          resolve({ name: file.name, content: text });
-        } catch (error) {
-          reject(error);
-        }
-      };
-
-      reader.onerror = (event) => {
-        reject(event.target.error);
-      };
-
-      reader.readAsArrayBuffer(file);
-    });
-  };
-
-  const handleFileContent = async (file) => {
-    if (file.name.endsWith('.docx')) {
-      const result = await readDocxFile(file);
-      return result;
-    } else if (file.name.endsWith('.txt')) {
-      const result = await readTextFile(file);
-      return result;
-    } else {
-      return { name: file.name, content: '' };
     }
   };
 
@@ -163,14 +168,41 @@ export default function DocTest() {
     if (sastrawi.length > 0) {
       // Build the term-document matrix
       const { termDocumentMatrix, terms } = buildTermDocumentMatrix(sastrawi);
+      const { termDocumentMatrixx, termss } = saveNewTerms(beforeSastrawi);
       setNewTerms(terms);
       setAllTerms([...allTerms, ...terms]);
 
       // Calculate the TF-IDF weights
       const tfidfWeights = calculateTfidf(termDocumentMatrix);
       setTfidf(tfidfWeights);
+      calculateTfidfForAllDocuments();
     }
-  }, [sastrawi]);
+  }, [sastrawi, beforeSastrawi]);
+
+  const saveNewTerms = (values) => {
+    const termDocumentMatrixx = {};
+    const termss = [];
+
+    values.forEach((document, documentIndex) => {
+      document.forEach((term) => {
+        if (!termDocumentMatrixx.hasOwnProperty(term)) {
+          termDocumentMatrixx[term] = {};
+          termss.push(term);
+        }
+
+        if (!termDocumentMatrixx[term].hasOwnProperty(documentIndex)) {
+          termDocumentMatrixx[term][documentIndex] = 0;
+        }
+
+        termDocumentMatrixx[term][documentIndex]++;
+        // console.log('term document matrix : ', termDocumentMatrix);
+      });
+    });
+
+    console.log('terms baru: ', termss);
+    setAllTermsOld(termss);
+    return { termDocumentMatrixx, termss };
+  };
 
   const buildTermDocumentMatrix = (documents) => {
     const termDocumentMatrix = {};
@@ -349,6 +381,26 @@ export default function DocTest() {
     console.log('ini transpose v:', transposeV);
     console.log('result diag x V :', resultDiagxV);
 
+    const maxValues = [];
+
+    for (let i = 0; i < resultDiagxV[0].length; i++) {
+      const column = resultDiagxV.map((row, rowIndex) => ({
+        value: row[i],
+        index: rowIndex,
+      }));
+      column.sort((a, b) => b.value - a.value);
+      const maxTwoValues = column.slice(0, 5);
+      maxValues.push(maxTwoValues);
+    }
+
+    maxValues.map((values, index) =>
+      values.map((values, index) => console.log(allTermsOld[values.index]))
+    );
+
+    setMaxValues(maxValues);
+
+    console.log(maxValues);
+
     const updatedMatrix = resultDiagxV.map((row) =>
       row.map((value) => (value < 0 ? -value : value))
     );
@@ -362,11 +414,18 @@ export default function DocTest() {
     const documentCount = sastrawi.length;
     const similarityMatrix = [];
 
+    // const tfidfLast = Object.values(values).map(
+    //   (obj) => obj[documentCount - 1]
+    // ); // Last index of each document
+
     const tfidfLast = Object.values(values[documentCount - 1]); // Last document
+    console.log('Last doc similarity', tfidfLast);
 
     for (let i = 0; i < documentCount - 1; i++) {
       const similarities = [];
       const tfidf1 = Object.values(values[i]);
+
+      //   const tfidf1 = Object.values(values).map((obj) => obj[i]);
 
       let dotProduct = 0;
       let magnitude1 = 0;
@@ -414,101 +473,72 @@ export default function DocTest() {
     console.log('Highest Similarity:', maxSimilarity);
     console.log('Lowest Similarity:', minSimilarity);
     console.log('threshold Similarity:', averageSimilarity);
-    console.log('filtered similarity', filteredSimilarityMatrix);
-    console.log(' array similarity', arraySimilarity);
-    console.log('file name', fileNames);
+    console.log('all similarity', similarityMatrix);
+    console.log('array similarity', arraySimilarity);
+    console.log('news', newsContents);
 
     setDocumentSimilarity(filteredSimilarityMatrix);
   };
 
-  const handleButtonClick = () => {
-    calculateTfidfForAllDocuments();
-  };
-
   return (
     <div>
-      <input type="text" value={query} onChange={handleInputChange} />
+      <h1>News Test</h1>
+      <input type="text" value={searchValue} onChange={handleQueryChange} />
+      <br />
+      <input type="text" value={kemiripan} onChange={handleKemiripanChange} />
+      <br />
       <input
-        type="file"
-        multiple
-        accept=".docx, .txt"
-        onChange={handleFileSelect}
+        type="text"
+        value={jumlahBerita}
+        onChange={handleJumlahBeritaChange}
       />
-
-      <div>
-        <h2>File Contents:</h2>
-        {fileContents.map((content, index) => (
-          <div key={index}>
-            <h3>{fileNames[index]}</h3>
-            <pre>{content}</pre>
-          </div>
+      <br />
+      <button onClick={handleOnClick}>Telusuri</button>
+      {/* <ul>
+        {newsData.map((values, index) => (
+          <li key={index}>{values.judul}</li>
         ))}
-      </div>
+      </ul> */}
+
+      <button onClick={handleSearch}>Search</button>
+      {searchResults.length > 0 ? (
+        <ul>
+          {searchResults.map((result, index) => (
+            <li key={index}>{result}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No results found.</p>
+      )}
 
       <div>
-        <h2>New Terms:</h2>
-        {newTerms.map((term, index) => (
-          <p key={index}>{term}</p>
-        ))}
+        {documentSimilarity.length > 0 &&
+          documentSimilarity.map((item, index) => {
+            if (item.length > 0) {
+              const keywords = maxValues[index];
+              const sIndex = searchIndex[index];
+              const similarityPercentage = item[0]; // Assuming the similarity value is at index 0
+              const formattedKeywords = keywords.map(
+                (values, index) => allTermsOld[values.index]
+              );
 
-        <button onClick={() => calculateTfidfForAllDocuments()}>
-          Calculate TF-IDF for All Documents
-        </button>
+              const allData = newsData[sIndex];
+              console.log(allData);
 
-        {tfidfWithZeros && (
-          <div>
-            <h2>TF-IDF with Zeros:</h2>
-            {Object.keys(tfidfWithZeros).map((documentIndex) => (
-              <div key={documentIndex}>
-                <h3>Document {documentIndex}:</h3>
-                {Object.keys(tfidfWithZeros[documentIndex]).map(
-                  (term, index) => (
-                    <p key={index}>
-                      {term}: {tfidfWithZeros[documentIndex][term]}
-                    </p>
-                  )
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {documentSimilarity && (
-          <div>
-            <h2>Document Similarity:</h2>
-            {documentSimilarity.map((similarities, i) => (
-              <div key={i}>
-                <h3>Document {i}:</h3>
-                {similarities.map((similarity, j) => (
-                  <p key={j}>
-                    Similarity with Document {j}: {similarity}%
-                  </p>
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
+              return (
+                <div>
+                  <a href={allData.link}>{allData.judul}</a>
+                  <p>{sIndex}</p>
+                  <p>{similarityPercentage}</p>
+                  <h5 className="mb-2">
+                    Kata Kunci Berita :
+                    <span>{formattedKeywords.join(', ')}</span>
+                  </h5>
+                </div>
+              );
+            }
+          })}
       </div>
-
-      <div>
-        <button onClick={handleLSA}>handle lsa</button>
-        <h1>LSA Similar Documents</h1>
-        {similarDocuments.length > 0 && (
-          <ul>
-            {similarDocuments.map((similarity) => (
-              <li key={similarity.documentIndex}>
-                Document {similarity.documentIndex}: Similarity ={' '}
-                {similarity.similarity}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <button onClick={handleButtonClick}>Calculate LSA</button>
-      {nonEmptySimilarity.map((item, index) => (
-        <li key={index}>Similarity {item[0]}</li>
-      ))}
     </div>
   );
 }

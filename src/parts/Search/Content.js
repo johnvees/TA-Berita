@@ -41,6 +41,13 @@ export default function Content() {
   const [ilNull, setIlNull] = useState(
     'https://dummyimage.com/600x400/e0e0e0/000000.png&text=No+Image'
   );
+  const [newsData, setNewsData] = useState([
+    { judul: '', isi: '', date: '', imageUrl: '', link: '' },
+  ]);
+  const [newsContents, setNewsContents] = useState([]);
+  const [titlenContent, setTitlenContent] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchIndex, setSearchIndex] = useState([]);
 
   const colRef = useRef(null);
   const dividerRef1 = useRef(null);
@@ -74,6 +81,83 @@ export default function Content() {
       setJumlahBeritaInfo(true);
     } else {
       setJumlahBeritaInfo(false);
+    }
+
+    const query = searchValue.toLowerCase();
+
+    const filteredIndices = [];
+    const results = titlenContent.filter((item, index) => {
+      const includesQuery = item.toLowerCase().includes(query);
+      if (includesQuery) {
+        filteredIndices.push(index);
+      }
+      return includesQuery;
+    });
+
+    console.log(results);
+    console.log(filteredIndices);
+    setSearchIndex(filteredIndices);
+
+    const filteredNewsData = filteredIndices.map((index) => newsData[index]);
+
+    console.log(filteredNewsData);
+    setSearchResults(results);
+    // Perform the search based on the searchQuery and your own data
+
+    if (results.length > 0) {
+      const updatedNewsContent = [...newsContents];
+      const contents = [];
+      const newTerms = [];
+
+      //text preprocessing query content
+      const queryContentString = searchValue.toString().toLowerCase();
+
+      const queryTokens = tokenizer.tokenize(queryContentString);
+      console.log('test token query', queryTokens);
+
+      const queryFilteredWords = queryTokens.filter(
+        (word) => !StopwordDictionary.includes(word)
+      );
+
+      const queryContent = [];
+      for (const word of queryFilteredWords) {
+        queryContent.push(stemmer.stem(word));
+      }
+
+      console.log('Query Content', queryContent);
+
+      for (let i = 0; i < results.length; i++) {
+        const content = results[i];
+
+        updatedNewsContent.push(content);
+
+        const contentString = content.toString().toLowerCase();
+        console.log('ini test lowercase:', contentString);
+
+        const tokens = tokenizer.tokenize(contentString);
+        console.log('ini test token:', tokens);
+
+        const filteredWords = tokens.filter(
+          (word) => !StopwordDictionary.includes(word)
+        );
+        console.log('ini test filteredWords:', filteredWords);
+
+        const newsContents = [];
+        for (const word of filteredWords) {
+          newsContents.push(stemmer.stem(word));
+        }
+        console.log('ini test stemming:', newsContents);
+        contents.push(newsContents);
+        newTerms.push(tokens);
+      }
+
+      const mergedContents = [...queryContent, ...newsContents];
+      contents.push(mergedContents);
+      console.log('merged content', mergedContents);
+
+      setSastrawi(contents);
+      setBeforeSastrawi(newTerms);
+      console.log('sastrawi + text ', contents);
     }
   };
 
@@ -431,103 +515,134 @@ export default function Content() {
   };
 
   const calculateDocumentSimilarity = (values) => {
-    const documentCount = sastrawi.length;
-    const similarityMatrix = [];
+    if (selectedOption === 'Portal Berita') {
+      const documentCount = sastrawi.length;
+      const similarityMatrix = [];
 
-    const tfidfLast = Object.values(values[documentCount - 1]); // Last document
+      // const tfidfLast = Object.values(values).map(
+      //   (obj) => obj[documentCount - 1]
+      // ); // Last index of each document
 
-    for (let i = 0; i < documentCount - 1; i++) {
-      const similarities = [];
-      const tfidf1 = Object.values(values[i]);
+      const tfidfLast = Object.values(values[documentCount - 1]); // Last document
+      console.log('Last doc similarity', tfidfLast);
 
-      let dotProduct = 0;
-      let magnitude1 = 0;
-      let magnitude2 = 0;
+      for (let i = 0; i < documentCount - 1; i++) {
+        const similarities = [];
+        const tfidf1 = Object.values(values[i]);
 
-      for (let k = 0; k < tfidf1.length; k++) {
-        dotProduct += tfidf1[k] * tfidfLast[k];
-        magnitude1 += tfidf1[k] ** 2;
-        magnitude2 += tfidfLast[k] ** 2;
+        //   const tfidf1 = Object.values(values).map((obj) => obj[i]);
+
+        let dotProduct = 0;
+        let magnitude1 = 0;
+        let magnitude2 = 0;
+
+        for (let k = 0; k < tfidf1.length; k++) {
+          dotProduct += tfidf1[k] * tfidfLast[k];
+          magnitude1 += tfidf1[k] ** 2;
+          magnitude2 += tfidfLast[k] ** 2;
+        }
+
+        magnitude1 = Math.sqrt(magnitude1);
+        magnitude2 = Math.sqrt(magnitude2);
+
+        const similarity = Math.round(
+          (dotProduct / (magnitude1 * magnitude2)) * 100
+        );
+
+        similarities.push(similarity);
+
+        similarityMatrix.push(similarities);
       }
 
-      magnitude1 = Math.sqrt(magnitude1);
-      magnitude2 = Math.sqrt(magnitude2);
+      const maxSimilarity = Math.max(...similarityMatrix.flat());
+      const minSimilarity = Math.min(...similarityMatrix.flat());
+      const averageSimilarity = (maxSimilarity + minSimilarity) / 2;
 
-      const similarity = Math.round(
-        (dotProduct / (magnitude1 * magnitude2)) * 100
+      const filteredSimilarityMatrix = similarityMatrix.map((similarities) => {
+        return similarities.filter(
+          (similarity) => similarity >= averageSimilarity
+        );
+      });
+
+      const arraySimilarity = filteredSimilarityMatrix.filter(
+        (item) => item.length !== 0
       );
 
-      similarities.push(similarity);
+      setNonEmptySimilarity(arraySimilarity);
 
-      similarityMatrix.push(similarities);
+      arraySimilarity.forEach((item, index) => {
+        console.log(`Value ${index}: ${item[0]}`);
+      });
 
-      // for (let j = 0; j < documentCount; j++) {
-      //   if (i === j) {
-      //     similarities.push(100); // Self-similarity is 100%
-      //     continue;
-      //   }
+      console.log('Highest Similarity:', maxSimilarity);
+      console.log('Lowest Similarity:', minSimilarity);
+      console.log('threshold Similarity:', averageSimilarity);
+      console.log('all similarity', similarityMatrix);
+      console.log('array similarity', arraySimilarity);
+      console.log('news', newsContents);
 
-      //   const tfidf1 = Object.values(values[i]);
-      //   const tfidf2 = Object.values(values[j]);
+      setDocumentSimilarity(filteredSimilarityMatrix);
+    } else if (selectedOption === 'Dokumen') {
+      const documentCount = sastrawi.length;
+      const similarityMatrix = [];
 
-      //   // const dotProduct = tfidf1.reduce(
-      //   //   (sum, value, index) => sum + value * tfidf2[index],
-      //   //   0
-      //   // );
-      //   // const magnitude1 = Math.sqrt(
-      //   //   tfidf1.reduce((sum, value) => sum + value ** 2, 0)
-      //   // );
-      //   // const magnitude2 = Math.sqrt(
-      //   //   tfidf2.reduce((sum, value) => sum + value ** 2, 0)
-      //   // );
+      const tfidfLast = Object.values(values).map(
+        (obj) => obj[documentCount - 1]
+      ); // Last index of each document
+      console.log('Last doc similarity', tfidfLast);
 
-      //   // similarities.push(
-      //   //   Math.round((dotProduct / (magnitude1 * magnitude2)) * 100)
-      //   // );
+      for (let i = 0; i < documentCount - 1; i++) {
+        const similarities = [];
+        const tfidf1 = Object.values(values).map((obj) => obj[i]);
 
-      //   let dotProduct = 0;
-      //   let magnitude1 = 0;
-      //   let magnitude2 = 0;
+        let dotProduct = 0;
+        let magnitude1 = 0;
+        let magnitude2 = 0;
 
-      //   for (let k = 0; k < tfidf1.length; k++) {
-      //     dotProduct += tfidf1[k] * tfidf2[k];
-      //     magnitude1 += tfidf1[k] ** 2;
-      //     magnitude2 += tfidf2[k] ** 2;
-      //   }
+        for (let k = 0; k < tfidf1.length; k++) {
+          dotProduct += tfidf1[k] * tfidfLast[k];
+          magnitude1 += tfidf1[k] ** 2;
+          magnitude2 += tfidfLast[k] ** 2;
+        }
+        console.log(dotProduct);
 
-      //   magnitude1 = Math.sqrt(magnitude1);
-      //   magnitude2 = Math.sqrt(magnitude2);
+        magnitude1 = Math.sqrt(magnitude1);
+        magnitude2 = Math.sqrt(magnitude2);
 
-      //   const similarity = Math.round(
-      //     (dotProduct / (magnitude1 * magnitude2)) * 100
-      //   );
-      //   similarities.push(similarity);
-      // }
+        const similarity = Math.round(
+          (dotProduct / (magnitude1 * magnitude2)) * 100
+        );
+
+        similarities.push(similarity);
+
+        similarityMatrix.push(similarities);
+      }
+
+      const maxSimilarity = Math.max(...similarityMatrix.flat());
+      const minSimilarity = Math.min(...similarityMatrix.flat());
+      const averageSimilarity = (maxSimilarity + minSimilarity) / 2;
+
+      const filteredSimilarityMatrix = similarityMatrix.map((similarities) => {
+        return similarities.filter(
+          (similarity) => similarity >= averageSimilarity
+        );
+      });
+
+      const arraySimilarity = filteredSimilarityMatrix.filter(
+        (item) => item.length !== 0
+      );
+
+      setNonEmptySimilarity(arraySimilarity);
+
+      console.log('All Similarity', similarityMatrix);
+      console.log('Highest Similarity:', maxSimilarity);
+      console.log('Lowest Similarity:', minSimilarity);
+      console.log('Threshold Similarity:', averageSimilarity);
+      console.log('filtered similarity:', filteredSimilarityMatrix);
+      console.log('array similarity:', arraySimilarity);
+
+      setDocumentSimilarity(filteredSimilarityMatrix);
     }
-
-    const maxSimilarity = Math.max(...similarityMatrix.flat());
-    const minSimilarity = Math.min(...similarityMatrix.flat());
-    const averageSimilarity = (maxSimilarity + minSimilarity) / 2;
-
-    const filteredSimilarityMatrix = similarityMatrix.map((similarities) => {
-      return similarities.filter(
-        (similarity) => similarity >= averageSimilarity
-      );
-    });
-
-    const arraySimilarity = filteredSimilarityMatrix.filter(
-      (item) => item.length !== 0
-    );
-
-    setNonEmptySimilarity(arraySimilarity);
-
-    console.log('Highest Similarity:', maxSimilarity);
-    console.log('Lowest Similarity:', minSimilarity);
-    console.log('Threshold Similarity:', averageSimilarity);
-    console.log('filtered similarity:', filteredSimilarityMatrix);
-    console.log('array similarity:', arraySimilarity);
-
-    setDocumentSimilarity(filteredSimilarityMatrix);
   };
 
   const handleResetDokumen = () => {
@@ -648,6 +763,8 @@ export default function Content() {
     setVectorDown(ICVectorDownBlue);
 
     if (!hasError) {
+      calculateTfidfForAllDocuments();
+
       setVectorDown(ICVectorDownGray);
       console.log('Search Value : ', searchValue, typeof searchValue);
       console.log('Jumlah Berita : ', jumlahBerita, typeof jumlahBerita);
@@ -762,9 +879,36 @@ export default function Content() {
     setGrabKategori(response.data.kategori);
   };
 
+  const grabNewsData = async () => {
+    const response = await axios.get(
+      'https://ta-berita-server.up.railway.app/api/v1/list-berita'
+    );
+
+    const collectNewsData = [];
+    const judulDanIsi = [];
+
+    console.log(response.data.berita);
+    for (let index = 0; index < response.data.berita.length; index++) {
+      const dataBerita = {
+        judul: response.data.berita[index].judul,
+        isi: response.data.berita[index].isi,
+        date: response.data.berita[index].date,
+        imageUrl: response.data.berita[index].imageUrl,
+        link: response.data.berita[index].link,
+      };
+      //   console.log(dataBerita);
+      collectNewsData.push(dataBerita);
+      judulDanIsi.push(dataBerita.judul + ' ' + dataBerita.isi);
+    }
+
+    setTitlenContent(judulDanIsi);
+    setNewsData(collectNewsData);
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
     ambilKategori();
+    grabNewsData();
   }, []);
 
   const renderFilterContent = () => {
@@ -818,7 +962,7 @@ export default function Content() {
 
               {jumlahBeritaInfo && jumlahBerita.length !== 0 && (
                 <p className="info">
-                  Saat ini layanan memiliki kapasitas maksimal sebanyak 10
+                  Saat ini layanan masih belum dapat digunakan
                 </p>
               )}
             </div>
@@ -851,7 +995,7 @@ export default function Content() {
 
               {nilaiKemiripanInfo && nilaiKemiripan.length !== 0 && (
                 <p className="info">
-                  Jika tidak diisi maka nilai minimum berdasarkan sistem
+                  Saat ini layanan masih belum dapat digunakan
                 </p>
               )}
             </div>
@@ -1094,7 +1238,7 @@ export default function Content() {
               type="text"
               value={searchValue}
               onChange={handleSearchChange}
-              placeholder="Masukkan Kata Kunci Pencarian"
+              placeholder="Masukkan Kata Kunci Pencarian Terlebih Dahulu"
               required
             />
 
@@ -1150,54 +1294,109 @@ export default function Content() {
             </span>
           </h5>
 
-          <div>
-            {documentSimilarity.length > 0 &&
-              documentSimilarity.map((item, index) => {
-                if (item.length > 0) {
-                  const fileName = fileNames[index]; // Assuming 'fileNames' is the state containing the file names
-                  const keywords = maxValues[index];
-                  const similarityPercentage = item[0]; // Assuming the similarity value is at index 0
-                  const formattedKeywords = keywords.map(
-                    (values, index) => allTermsOld[values.index]
-                  );
-                  // const keyword = keywords[index]; // Assuming 'keywords' is the state containing the keywords
+          {selectedOption === 'Dokumen' && (
+            <div>
+              {documentSimilarity.length > 0 &&
+                documentSimilarity.map((item, index) => {
+                  if (item.length > 0) {
+                    const fileName = fileNames[index]; // Assuming 'fileNames' is the state containing the file names
+                    const keywords = maxValues[index];
+                    const similarityPercentage = item[0]; // Assuming the similarity value is at index 0
+                    const formattedKeywords = keywords.map(
+                      (values, index) => allTermsOld[values.index]
+                    );
+                    // const keyword = keywords[index]; // Assuming 'keywords' is the state containing the keywords
 
-                  return (
-                    <div
-                      key={index}
-                      className="news-result-wrapper rounded-lg mt-5"
-                    >
-                      <div className="row">
-                        <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                          <img
-                            className="mb-3"
-                            src={ilNull}
-                            alt=""
-                            style={{
-                              width: '100%',
-                              maxHeight: '200px',
-                              objectFit: 'cover',
-                            }}
-                          />
-                        </div>
-                        <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                          <h4 className="mb-3">{fileName}</h4>
-                          <h5 className="mb-2">
-                            Persentase Kemiripan :{' '}
-                            <span>{similarityPercentage}%</span>
-                          </h5>
-                          <h5 className="mb-2">
-                            Kata Kunci Berita :
-                            <span>{formattedKeywords.join(', ')}</span>
-                          </h5>
+                    return (
+                      <div
+                        key={index}
+                        className="news-result-wrapper rounded-lg mt-5"
+                      >
+                        <div className="row">
+                          <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                            <img
+                              className="mb-3"
+                              src={ilNull}
+                              alt=""
+                              style={{
+                                width: '100%',
+                                maxHeight: '200px',
+                                objectFit: 'cover',
+                              }}
+                            />
+                          </div>
+                          <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                            <h4 className="mb-3">{fileName}</h4>
+                            <h5 className="mb-2">
+                              Persentase Kemiripan :{' '}
+                              <span>{similarityPercentage}%</span>
+                            </h5>
+                            <h5 className="mb-2">
+                              Kata Kunci Berita :
+                              <span>{formattedKeywords.join(', ')}</span>
+                            </h5>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                }
-                return null;
-              })}
-          </div>
+                    );
+                  }
+                  return null;
+                })}
+            </div>
+          )}
+
+          {selectedOption === 'Portal Berita' && (
+            <div>
+              {documentSimilarity.length > 0 &&
+                documentSimilarity.map((item, index) => {
+                  if (item.length > 0) {
+                    const keywords = maxValues[index];
+                    const sIndex = searchIndex[index];
+                    const similarityPercentage = item[0]; // Assuming the similarity value is at index 0
+                    const formattedKeywords = keywords.map(
+                      (values, index) => allTermsOld[values.index]
+                    );
+                    const allData = newsData[sIndex];
+
+                    return (
+                      <div
+                        key={index}
+                        className="news-result-wrapper rounded-lg mt-5"
+                      >
+                        <div className="row">
+                          <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                            <img
+                              className="mb-3"
+                              src={allData.imageUrl}
+                              alt=""
+                              style={{
+                                width: '100%',
+                                maxHeight: '200px',
+                                objectFit: 'cover',
+                              }}
+                            />
+                          </div>
+                          <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                            <h4 className="mb-3">
+                              <a href={allData.link}>{allData.judul}</a>
+                            </h4>
+                            <h5 className="mb-2">
+                              Persentase Kemiripan :{' '}
+                              <span>{similarityPercentage}%</span>
+                            </h5>
+                            <h5 className="mb-2">
+                              Kata Kunci Berita :
+                              <span>{formattedKeywords.join(', ')}</span>
+                            </h5>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+            </div>
+          )}
         </div>
       )}
     </section>
