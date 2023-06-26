@@ -46,9 +46,9 @@ export default function Header() {
             </ul>
 
             {/* dipakai ketika belum melakukan login */}
-            <Button className="btn btn-login" type="link" href="/auth">
+            {/* <Button className="btn btn-login" type="link" href="/auth">
               Masuk / Daftar
-            </Button>
+            </Button> */}
 
             {/* dipakai ketika telah melakukan login */}
             {/* <div className="nav-item dropdown">
