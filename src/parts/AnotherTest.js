@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import numeric from 'numeric';
+import React, { useState } from 'react';
 
 const AnotherTest = () => {
   const data = [
