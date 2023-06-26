@@ -16,7 +16,7 @@ export default function Content() {
   const [nilaiKemiripan, setNilaiKemiripan] = useState('');
   const [url, setURL] = useState('');
   const [tfidf, setTfidf] = useState(null);
-  const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
+  const [setTfidfWithZeros] = useState(null);
   const [documentSimilarity, setDocumentSimilarity] = useState(null);
   const [urlList, setURLList] = useState([]);
   const [files, setFiles] = useState([]);
@@ -24,11 +24,10 @@ export default function Content() {
   const [fileNames, setFileNames] = useState([]);
   const [beforeSastrawi, setBeforeSastrawi] = useState([]);
   const [sastrawi, setSastrawi] = useState([]);
-  const [newTerms, setNewTerms] = useState([]);
+  const [setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
   const [allTermsOld, setAllTermsOld] = useState([]);
   const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
-  const [resultSVD, setResultSVD] = useState([]);
   const [maxValues, setMaxValues] = useState([]);
   const [grabKategori, setGrabKategori] = useState([]);
   const [showResult, setShowResult] = useState(false);
@@ -38,15 +37,15 @@ export default function Content() {
   const [nilaiKemiripanInfo, setNilaiKemiripanInfo] = useState(false);
   const [urlWarning, setUrlWarning] = useState(false);
   const [filesWarning, setFilesWarning] = useState(false);
-  const [ilNull, setIlNull] = useState(
+  const [ilNull] = useState(
     'https://dummyimage.com/600x400/e0e0e0/000000.png&text=No+Image'
   );
   const [newsData, setNewsData] = useState([
     { judul: '', isi: '', date: '', imageUrl: '', link: '' },
   ]);
-  const [newsContents, setNewsContents] = useState([]);
+  const [newsContents] = useState([]);
   const [titlenContent, setTitlenContent] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
+  const [setSearchResults] = useState([]);
   const [searchIndex, setSearchIndex] = useState([]);
 
   const colRef = useRef(null);
@@ -272,7 +271,7 @@ export default function Content() {
     if (sastrawi.length > 0) {
       // Build the term-document matrix
       const { termDocumentMatrix, terms } = buildTermDocumentMatrix(sastrawi);
-      const { termDocumentMatrixx, termss } = saveNewTerms(beforeSastrawi);
+      saveNewTerms(beforeSastrawi);
       setNewTerms(terms);
       setAllTerms([...allTerms, ...terms]);
 

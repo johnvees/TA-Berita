@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import JSZip from 'jszip';
 import { Stemmer, Tokenizer } from 'sastrawijs';
 import numeric from 'numeric';
-import cosineSimilarity from 'cosine-similarity';
 import StopwordDictionary from '../utils/StopwordDictionary';
 
 export default function DocTest() {
@@ -14,10 +13,10 @@ export default function DocTest() {
   const [newTerms, setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
   const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
-  const [thresholdSimilarity, setThresholdSimilarity] = useState(0);
+  const [setThresholdSimilarity] = useState(0);
   const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
   const [documentSimilarity, setDocumentSimilarity] = useState(null);
-  const [similarDocuments, setSimilarDocuments] = useState([]);
+  const [similarDocuments] = useState([]);
 
   const stemmer = new Stemmer();
   const tokenizer = new Tokenizer();
