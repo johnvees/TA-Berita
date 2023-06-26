@@ -296,6 +296,190 @@ header {
   }
 }
 
+.hero-search {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .search-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h1 {
+      font-family: SFPD-Bold;
+      font-size: 54px;
+      color: $black;
+      text-align: center;
+      margin-bottom: 34px;
+      max-width: 872px;
+    }
+  }
+
+  .search-menu-wrapper {
+    border: 1px dashed $dark;
+    width: 100%;
+
+    .input-group {
+      .form-control {
+        border-color: $black;
+        color: $black;
+        font-family: 'SFPD-Regular';
+
+        &:focus {
+          box-shadow: none;
+        }
+
+        &.input-warning {
+          border-color: $red;
+        }
+      }
+
+      .input-group-text {
+        background-color: $primary;
+        color: $white;
+        font-family: 'SFPD-Semibold';
+        border: 1px solid $black;
+        padding: 0 32px;
+
+        &.persen {
+          padding: 0 12px;
+        }
+
+        &.deactive {
+          background-color: $light;
+          color: $dark;
+        }
+      }
+    }
+
+    p {
+      &.warning {
+        font-family: SFPD-Regular;
+        font-size: 12px;
+        color: $red;
+        margin-bottom: 0px;
+      }
+
+      &.info {
+        color: $dark;
+        font-family: SFPD-Regular;
+        font-size: 12px;
+        margin-bottom: 0px;
+      }
+    }
+  }
+
+  .search-filter-wrapper {
+    padding: 16px;
+
+    p {
+      font-family: 'SFPD-Regular';
+      font-size: 16px;
+      color: $dark;
+    }
+
+    .custom-select {
+      border-color: $black;
+      font-family: 'SFPD-Regular';
+
+      &:focus {
+        box-shadow: none;
+      }
+
+      option:hover {
+        background-color: $primary;
+      }
+    }
+
+    .vertical-divider {
+      height: 100%; /* Adjust the height as needed */
+      border: none;
+      border-left: 1px dashed $dark;
+    }
+
+    .horizontal-divider {
+      border: none;
+      border-bottom: 1px dashed $dark;
+      width: calc(100% + 32px);
+      margin-left: -16px;
+    }
+
+    .btn {
+      background-color: $primary;
+      font-family: 'SFPD-Semibold';
+      color: $white;
+      display: block;
+      width: 100%;
+      &:focus {
+        box-shadow: none;
+      }
+
+      &.btn-reset {
+        background-color: $red;
+        font-family: 'SFPD-Semibold';
+        color: $white;
+        display: block;
+        width: 100%;
+        &:focus {
+          box-shadow: none;
+        }
+
+        &.deactive {
+          background-color: $light;
+          color: $dark;
+        }
+      }
+    }
+  }
+}
+
+.result-search {
+  .result-title-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h1 {
+      font-family: 'SFPD-Bold';
+      font-size: 54px;
+      color: $black;
+      text-align: center;
+      margin-bottom: 34px;
+      max-width: 872px;
+    }
+  }
+
+  h4 {
+    font-family: 'SFPD-Semibold';
+    font-size: 24px;
+    color: $black;
+  }
+
+  h5 {
+    font-family: 'SFPD-Regular';
+    font-size: 20px;
+    color: $dark;
+
+    &.half {
+      font-size: 22px;
+    }
+
+    span {
+      font-family: 'SFPD-Semibold';
+      color: $black;
+    }
+  }
+
+  .news-result-wrapper {
+    border: 1px dashed $dark;
+    padding: 16px;
+  }
+}
+
 .content-about {
   .first-content {
     padding: 0 15px;
@@ -453,7 +637,7 @@ header {
 
       &.warning {
         font-size: 12px;
-        color: red;
+        color: $red;
         margin-top: -24px;
       }
     }
@@ -472,13 +656,14 @@ header {
       .form-control {
         border-color: $black;
         color: $black;
+        font-family: 'SFPD-Regular';
 
         &:focus {
           box-shadow: none;
         }
 
         &.input-warning {
-          border-color: red;
+          border-color: $red;
         }
       }
     }
@@ -556,7 +741,7 @@ header {
 
       &.warning {
         font-size: 12px;
-        color: red;
+        color: $red;
         margin-top: -24px;
       }
     }
@@ -574,13 +759,14 @@ header {
       .form-control {
         border-color: $black;
         color: $black;
+        font-family: 'SFPD-Regular';
 
         &:focus {
           box-shadow: none;
         }
 
         &.input-warning {
-          border-color: red;
+          border-color: $red;
         }
       }
     }
