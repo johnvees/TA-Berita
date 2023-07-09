@@ -497,9 +497,9 @@ export default function Content() {
       maxValues.push(maxTwoValues);
     }
 
-    maxValues.map((values, index) =>
-      values.map((values, index) => console.log(allTermsOld[values.index]))
-    );
+    // maxValues.map((values, index) =>
+    //   values.map((values, index) => console.log(allTermsOld[values.index]))
+    // );
 
     setMaxValues(maxValues);
 
@@ -511,7 +511,7 @@ export default function Content() {
 
     console.log(updatedMatrix);
 
-    calculateDocumentSimilarity(resultDiagxV);
+    calculateDocumentSimilarity(updatedMatrix);
   };
 
   const calculateDocumentSimilarity = (values) => {
@@ -1303,7 +1303,7 @@ export default function Content() {
                     const keywords = maxValues[index];
                     const similarityPercentage = item[0]; // Assuming the similarity value is at index 0
                     const formattedKeywords = keywords.map(
-                      (values, index) => allTermsOld[values.index]
+                      (values, index) => allTerms[values.index]
                     );
                     // const keyword = keywords[index]; // Assuming 'keywords' is the state containing the keywords
 
