@@ -8,10 +8,10 @@ export default class TestPage extends Component {
   render() {
     return (
       <>
-        <TestPart></TestPart>
+        {/* <TestPart></TestPart> */}
         <DocTest></DocTest>
-        <AnotherTest></AnotherTest>
-        <NewsTest></NewsTest>
+        {/* <AnotherTest></AnotherTest> */}
+        {/* <NewsTest></NewsTest> */}
       </>
     );
   }
