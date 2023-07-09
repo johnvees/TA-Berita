@@ -9,9 +9,9 @@ export default class TestPage extends Component {
     return (
       <>
         {/* <TestPart></TestPart> */}
-        {/* <DocTest></DocTest> */}
-        <AnotherTest></AnotherTest>
-        <NewsTest></NewsTest>
+        <DocTest></DocTest>
+        {/* <AnotherTest></AnotherTest> */}
+        {/* <NewsTest></NewsTest> */}
       </>
     );
   }

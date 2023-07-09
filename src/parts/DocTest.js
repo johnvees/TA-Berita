@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import JSZip from 'jszip';
 import { Stemmer, Tokenizer } from 'sastrawijs';
-import numeric from 'numeric';
-import cosineSimilarity from 'cosine-similarity';
+import numeric, { div } from 'numeric';
 import StopwordDictionary from '../utils/StopwordDictionary';
 
 export default function DocTest() {
@@ -10,14 +9,32 @@ export default function DocTest() {
   const [fileNames, setFileNames] = useState([]);
   const [query, setQuery] = useState('');
   const [sastrawi, setSastrawi] = useState([]);
+  const [lowerCaseDoc, setlowerCaseDoc] = useState([]);
+  const [lowerCaseQuery, setlowerCaseQuery] = useState('');
+  const [tokenDoc, setTokenDoc] = useState([]);
+  const [tokenQuery, setTokenQuery] = useState([]);
+  const [filterDoc, setFilterDoc] = useState([]);
+  const [filterQuery, setFilterQuery] = useState([]);
+  const [stemmingDoc, setStemmingDoc] = useState([]);
+  const [stemmingQuery, setStemmingQuery] = useState([]);
+  const [svdU, setSvdU] = useState([]);
+  const [svdV, setSvdV] = useState([]);
+  const [svdDiag, setSvdDiag] = useState([]);
+  const [svdUDiag, setSvdUDiag] = useState([]);
+  const [svdDiagV, setSvdDiagV] = useState([]);
+  const [allSimilarity, setAllSimilarity] = useState([]);
+  const [similarityThreshold, setSimilarityThreshold] = useState(null);
+  const [maxValues, setMaxValues] = useState([]);
+  const [beforeSastrawi, setBeforeSastrawi] = useState([]);
+  const [allTermsOld, setAllTermsOld] = useState([]);
   const [tfidf, setTfidf] = useState(null);
   const [newTerms, setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
   const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
-  const [thresholdSimilarity, setThresholdSimilarity] = useState(0);
+  const [setThresholdSimilarity] = useState(0);
   const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
   const [documentSimilarity, setDocumentSimilarity] = useState(null);
-  const [similarDocuments, setSimilarDocuments] = useState([]);
+  const [similarDocuments] = useState([]);
 
   const stemmer = new Stemmer();
   const tokenizer = new Tokenizer();
@@ -34,23 +51,32 @@ export default function DocTest() {
       const updatedFileContents = [...fileContents];
       const updatedFileNames = [...fileNames];
       const contents = [];
+      const lowercase = [];
+      const tokenizing = [];
+      const filtering = [];
+      const newTerms = [];
 
       const searchQuery = query;
 
       //text preprocessing query content
       const queryContentString = searchQuery.toString().toLowerCase();
+      setlowerCaseQuery(queryContentString);
 
       const queryTokens = tokenizer.tokenize(queryContentString);
       console.log('test token query', queryTokens);
+      setTokenQuery(queryTokens);
 
       const queryFilteredWords = queryTokens.filter(
         (word) => !StopwordDictionary.includes(word)
       );
+      setFilterQuery(queryFilteredWords);
 
       const queryContent = [];
       for (const word of queryFilteredWords) {
         queryContent.push(stemmer.stem(word));
       }
+
+      setStemmingQuery(queryContent);
 
       console.log('Query Content', queryContent);
 
@@ -82,13 +108,23 @@ export default function DocTest() {
         }
         console.log('ini test stemming:', fileContents);
         contents.push(fileContents);
+        newTerms.push(tokens);
+        lowercase.push(contentString);
+        tokenizing.push(tokens);
+        filtering.push(filteredWords);
+        setlowerCaseDoc(lowercase);
+        setTokenDoc(tokenizing);
+        setFilterDoc(filtering);
+        setStemmingDoc(contents);
       }
 
+      console.log(contents);
       const mergedContents = [...queryContent, ...fileContents];
       contents.push(mergedContents);
       console.log('merged content', mergedContents);
 
       setSastrawi(contents);
+      setBeforeSastrawi(newTerms);
       console.log('sastrawi + text ', contents);
       console.log('file names', updatedFileNames);
       setFileContents(updatedFileContents);
@@ -163,6 +199,8 @@ export default function DocTest() {
     if (sastrawi.length > 0) {
       // Build the term-document matrix
       const { termDocumentMatrix, terms } = buildTermDocumentMatrix(sastrawi);
+      const { termDocumentMatrixx, termss } = saveNewTerms(beforeSastrawi);
+
       setNewTerms(terms);
       setAllTerms([...allTerms, ...terms]);
 
@@ -170,7 +208,32 @@ export default function DocTest() {
       const tfidfWeights = calculateTfidf(termDocumentMatrix);
       setTfidf(tfidfWeights);
     }
-  }, [sastrawi]);
+  }, [sastrawi, beforeSastrawi]);
+
+  const saveNewTerms = (values) => {
+    const termDocumentMatrixx = {};
+    const termss = [];
+
+    values.forEach((document, documentIndex) => {
+      document.forEach((term) => {
+        if (!termDocumentMatrixx.hasOwnProperty(term)) {
+          termDocumentMatrixx[term] = {};
+          termss.push(term);
+        }
+
+        if (!termDocumentMatrixx[term].hasOwnProperty(documentIndex)) {
+          termDocumentMatrixx[term][documentIndex] = 0;
+        }
+
+        termDocumentMatrixx[term][documentIndex]++;
+        // console.log('term document matrix : ', termDocumentMatrix);
+      });
+    });
+
+    console.log('terms baru: ', termss);
+    setAllTermsOld(termss);
+    return { termDocumentMatrixx, termss };
+  };
 
   const buildTermDocumentMatrix = (documents) => {
     const termDocumentMatrix = {};
@@ -305,12 +368,16 @@ export default function DocTest() {
       }
       diagMatrix.push(row);
     }
+
+    setSvdU(U);
+    setSvdDiag(diagMatrix);
     console.log('svdU:', U);
     console.log('svdS:', S);
     console.log('diagonal matrix : ', diagMatrix);
     console.log('svdV:', V);
 
     const transposeV = V[0].map((col, i) => V.map((row) => row[i]));
+    setSvdV(transposeV);
 
     const rowsU = U.length;
     const colsU = U[0].length;
@@ -327,6 +394,8 @@ export default function DocTest() {
         }
       }
     }
+
+    setSvdUDiag(resultMatrixDiag);
 
     console.log('result U x S :', resultMatrixDiag);
 
@@ -349,9 +418,29 @@ export default function DocTest() {
     console.log('ini transpose v:', transposeV);
     console.log('result diag x V :', resultDiagxV);
 
+    const maxValues = [];
+
+    for (let i = 0; i < resultDiagxV[0].length; i++) {
+      const column = resultDiagxV.map((row, rowIndex) => ({
+        value: row[i],
+        index: rowIndex,
+      }));
+      column.sort((a, b) => b.value - a.value);
+      const maxTwoValues = column.slice(0, 5);
+      maxValues.push(maxTwoValues);
+    }
+
+    // maxValues.map((values, index) =>
+    //   values.map((values, index) => console.log(allTermsOld[values.index]))
+    // );
+
+    setMaxValues(maxValues);
+
     const updatedMatrix = resultDiagxV.map((row) =>
       row.map((value) => (value < 0 ? -value : value))
     );
+
+    setSvdDiagV(updatedMatrix);
 
     console.log(updatedMatrix);
 
@@ -362,18 +451,27 @@ export default function DocTest() {
     const documentCount = sastrawi.length;
     const similarityMatrix = [];
 
-    const tfidfLast = Object.values(values[documentCount - 1]); // Last document
+    const tfidfLast = Object.values(values).map(
+      (obj) => obj[documentCount - 1]
+    ); // Last index of each document
+
+    console.log('tfidfLast', tfidfLast);
 
     for (let i = 0; i < documentCount - 1; i++) {
       const similarities = [];
-      const tfidf1 = Object.values(values[i]);
+      const tfidf1 = Object.values(values).map((obj) => obj[i]);
+      console.log('tfidf', tfidf1);
+      console.log('tfidf length', tfidf1.length);
 
       let dotProduct = 0;
       let magnitude1 = 0;
       let magnitude2 = 0;
 
       for (let k = 0; k < tfidf1.length; k++) {
-        dotProduct += tfidf1[k] * tfidfLast[k];
+        console.log('tfidf1', tfidf1[k]);
+        console.log('tfidflast', tfidfLast[k]);
+        dotProduct += (tfidf1[k] * tfidfLast[k]);
+        console.log('dot product', dotProduct);
         magnitude1 += tfidf1[k] ** 2;
         magnitude2 += tfidfLast[k] ** 2;
       }
@@ -390,9 +488,13 @@ export default function DocTest() {
       similarityMatrix.push(similarities);
     }
 
+    setAllSimilarity(similarityMatrix);
+
     const maxSimilarity = Math.max(...similarityMatrix.flat());
     const minSimilarity = Math.min(...similarityMatrix.flat());
     const averageSimilarity = (maxSimilarity + minSimilarity) / 2;
+
+    setSimilarityThreshold(averageSimilarity);
 
     const filteredSimilarityMatrix = similarityMatrix.map((similarities) => {
       return similarities.filter(
@@ -405,7 +507,6 @@ export default function DocTest() {
     );
 
     setNonEmptySimilarity(arraySimilarity);
-    setThresholdSimilarity(averageSimilarity);
 
     arraySimilarity.forEach((item, index) => {
       console.log(`Value ${index}: ${item[0]}`);
@@ -436,79 +537,313 @@ export default function DocTest() {
       />
 
       <div>
-        <h2>File Contents:</h2>
-        {fileContents.map((content, index) => (
-          <div key={index}>
-            <h3>{fileNames[index]}</h3>
-            <pre>{content}</pre>
-          </div>
-        ))}
+        <h2>Raw Text Data:</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Contoh Berita</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fileContents.map((content, index) => (
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td>{content}</td>
+              </tr>
+            ))}
+            <tr>
+              <td>q</td>
+              <td>{query}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div>
-        <h2>New Terms:</h2>
-        {newTerms.map((term, index) => (
-          <p key={index}>{term}</p>
-        ))}
-
-        <button onClick={() => calculateTfidfForAllDocuments()}>
-          Calculate TF-IDF for All Documents
-        </button>
-
-        {tfidfWithZeros && (
-          <div>
-            <h2>TF-IDF with Zeros:</h2>
-            {Object.keys(tfidfWithZeros).map((documentIndex) => (
-              <div key={documentIndex}>
-                <h3>Document {documentIndex}:</h3>
-                {Object.keys(tfidfWithZeros[documentIndex]).map(
-                  (term, index) => (
-                    <p key={index}>
-                      {term}: {tfidfWithZeros[documentIndex][term]}
-                    </p>
-                  )
-                )}
-              </div>
+        <h2>Case Folding:</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Contoh Berita</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lowerCaseDoc.map((content, index) => (
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td>{content}</td>
+              </tr>
             ))}
-          </div>
-        )}
+            <tr>
+              <td>q</td>
+              <td>{lowerCaseQuery}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-        {documentSimilarity && (
-          <div>
-            <h2>Document Similarity:</h2>
-            {documentSimilarity.map((similarities, i) => (
-              <div key={i}>
-                <h3>Document {i}:</h3>
-                {similarities.map((similarity, j) => (
-                  <p key={j}>
-                    Similarity with Document {j}: {similarity}%
-                  </p>
+      <div>
+        <h2>Tokenizing:</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Sebelum</th>
+              <th>Sesudah</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tokenDoc.map((content, index) => (
+              <tr key={index}>
+                {lowerCaseDoc[index] && <td>{lowerCaseDoc[index]}</td>}
+                <td>{content}</td>
+              </tr>
+            ))}
+            <tr>
+              <td>{lowerCaseQuery}</td>
+              <td>{tokenQuery}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>Filtering:</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Sebelum</th>
+              <th>Sesudah</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filterDoc.map((content, index) => (
+              <tr key={index}>
+                {tokenDoc[index] && <td>{tokenDoc[index]}</td>}
+                <td>{content}</td>
+              </tr>
+            ))}
+            <tr>
+              <td>{tokenQuery}</td>
+              <td>{filterQuery}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>Stemming:</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Sebelum</th>
+              <th>Sesudah</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stemmingDoc.map((content, index) => (
+              <tr key={index}>
+                {filterDoc[index] && <td>{filterDoc[index]}</td>}
+                <td>{content}</td>
+              </tr>
+            ))}
+            <tr>
+              <td>{filterQuery}</td>
+              <td>{stemmingQuery}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {tfidfWithZeros && (
+        <div>
+          <h2>TF-IDF:</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Term</th>
+                {Object.keys(tfidfWithZeros).map((documentIndex) => (
+                  <th key={documentIndex}>Document {documentIndex}</th>
                 ))}
-              </div>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(tfidfWithZeros[0]).map((term, index) => (
+                <tr key={index}>
+                  <td>{term}</td>
+                  {Object.keys(tfidfWithZeros).map((documentIndex) => (
+                    <td key={documentIndex}>
+                      {tfidfWithZeros[documentIndex][term]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div>
+        <h2>Matrix U</h2>
+        <table className="table">
+          <tbody>
+            {svdU.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex}>{cell}</td>
+                ))}
+              </tr>
             ))}
-          </div>
-        )}
+          </tbody>
+        </table>
       </div>
 
       <div>
-        <button onClick={handleLSA}>handle lsa</button>
-        <h1>LSA Similar Documents</h1>
-        {similarDocuments.length > 0 && (
-          <ul>
-            {similarDocuments.map((similarity) => (
-              <li key={similarity.documentIndex}>
-                Document {similarity.documentIndex}: Similarity ={' '}
-                {similarity.similarity}
-              </li>
+        <h2>Matrix Diagonal</h2>
+        <table className="table">
+          <tbody>
+            {svdDiag.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex}>{cell}</td>
+                ))}
+              </tr>
             ))}
-          </ul>
-        )}
+          </tbody>
+        </table>
       </div>
+
+      <div>
+        <h2>Matrix V</h2>
+        <table className="table">
+          <tbody>
+            {svdV.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>Matrix U x Diag</h2>
+        <table className="table">
+          <tbody>
+            {svdUDiag.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>Matrix Diag x V</h2>
+        <table className="table">
+          <tbody>
+            {svdDiagV.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>All Similarities</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Documents</th>
+              <th>Similarity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allSimilarity.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <>
+                    <td>Document : {rowIndex + 1}</td>
+                    <td key={cellIndex}>{cell}</td>
+                  </>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>Similarity Threshold : {similarityThreshold} %</h2>
+      </div>
+
+      {documentSimilarity && (
+        <div>
+          <h2>Passed Documents</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Documents</th>
+                <th>Similarity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {documentSimilarity
+                .filter((content) => content !== 0)
+                .map((content, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{content}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {documentSimilarity &&
+        documentSimilarity.map((item, index) => {
+          if (item.length > 0) {
+            const fileName = fileNames[index];
+            const keyword = maxValues[index];
+            const similarityPercentage = item[0];
+            const formattedKeywords = keyword.map(
+              (values, index) => allTerms[values.index]
+            );
+
+            return (
+              <div key={index}>
+                <h2>Topic Extraction</h2>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Document</th>
+                      <th>Keywords</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{fileName}</td>
+                      <td>{formattedKeywords.join(', ')}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            );
+          }
+        })}
 
       <button onClick={handleButtonClick}>Calculate LSA</button>
-      {nonEmptySimilarity.map((item, index) => (
-        <li key={index}>Similarity {item[0]}</li>
-      ))}
     </div>
   );
 }

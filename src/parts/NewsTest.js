@@ -11,17 +11,17 @@ export default function NewsTest() {
   const [newsData, setNewsData] = useState([
     { judul: '', isi: '', date: '', imageUrl: '', link: '' },
   ]);
-  const [thresholdSimilarity, setThresholdSimilarity] = useState(0);
+  const [setThresholdSimilarity] = useState(0);
   const [tfidf, setTfidf] = useState(null);
-  const [tfidfWithZeros, setTfidfWithZeros] = useState(null);
+  const [setTfidfWithZeros] = useState(null);
   const [documentSimilarity, setDocumentSimilarity] = useState([]);
   const [sastrawi, setSastrawi] = useState([]);
   const [beforeSastrawi, setBeforeSastrawi] = useState([]);
-  const [newTerms, setNewTerms] = useState([]);
+  const [setNewTerms] = useState([]);
   const [allTerms, setAllTerms] = useState([]);
   const [allTermsOld, setAllTermsOld] = useState([]);
-  const [nonEmptySimilarity, setNonEmptySimilarity] = useState([]);
-  const [newsContents, setNewsContents] = useState([]);
+  const [setNonEmptySimilarity] = useState([]);
+  const [newsContents] = useState([]);
   const [titlenContent, setTitlenContent] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [maxValues, setMaxValues] = useState([]);
@@ -168,7 +168,7 @@ export default function NewsTest() {
     if (sastrawi.length > 0) {
       // Build the term-document matrix
       const { termDocumentMatrix, terms } = buildTermDocumentMatrix(sastrawi);
-      const { termDocumentMatrixx, termss } = saveNewTerms(beforeSastrawi);
+      saveNewTerms(beforeSastrawi);
       setNewTerms(terms);
       setAllTerms([...allTerms, ...terms]);
 

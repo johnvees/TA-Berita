@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 export default function TestPart() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [berita, setBerita] = useState([]);
+  const [setBerita] = useState([]);
   const [judul, setJudul] = useState([]);
-  const [isis, setIsi] = useState([]);
   const [body, setBody] = useState({
     judul: [],
     isi: [],
@@ -71,10 +70,7 @@ export default function TestPart() {
     //   'https://ta-berita-server.up.railway.app/api/v1/list-berita',
     //   body
     // );
-    const response = await axios.post(
-      'http://localhost:3001/api/v1/add-kategori',
-      judul
-    );
+    await axios.post('http://localhost:3001/api/v1/add-kategori', judul);
   };
 
   // useEffect(() => {
